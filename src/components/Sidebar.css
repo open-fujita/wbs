@@ -9,8 +9,58 @@
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    overflow-x: hidden;
     position: sticky;
     top: 0;
+}
+
+/* 格納時のサイドバー */
+.sidebar-collapsed {
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 16px;
+}
+
+.sidebar-expand-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #525252;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.sidebar-expand-btn:hover {
+    background: #e5e5e5;
+    color: #171717;
+}
+
+.sidebar-collapse-btn {
+    position: absolute;
+    top: 12px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #525252;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    z-index: 10;
+}
+
+.sidebar-collapse-btn:hover {
+    background: #e5e5e5;
+    color: #171717;
 }
 
 /* ロゴ */
@@ -18,7 +68,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 16px 16px 12px;
+    padding: 16px 36px 12px 16px;
     border-bottom: 1px solid #e5e5e5;
 }
 

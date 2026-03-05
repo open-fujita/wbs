@@ -9,6 +9,8 @@ interface SidebarProps {
     onSelectProject: (projectId: string) => void;
     onChangePage: (page: PageType) => void;
     onCreateProject: () => void;
+    collapsed?: boolean;
+    onToggleCollapse?: () => void;
 }
 
 /**
@@ -22,6 +24,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     onSelectProject,
     onChangePage,
     onCreateProject,
+    collapsed = false,
+    onToggleCollapse,
 }) => {
     // ツリーの開閉状態
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
@@ -75,8 +79,40 @@ export const Sidebar: React.FC<SidebarProps> = ({
         });
     };
 
+    if (collapsed) {
+        return (
+            <aside className="sidebar sidebar-collapsed">
+                <button
+                    type="button"
+                    className="sidebar-expand-btn"
+                    onClick={onToggleCollapse}
+                    aria-label="サイドパネルを展開"
+                    title="サイドパネルを展開"
+                >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                </button>
+            </aside>
+        );
+    }
+
     return (
         <aside className="sidebar">
+            {/* 格納ボタン */}
+            {onToggleCollapse && (
+                <button
+                    type="button"
+                    className="sidebar-collapse-btn"
+                    onClick={onToggleCollapse}
+                    aria-label="サイドパネルを格納"
+                    title="サイドパネルを格納"
+                >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polyline points="15 18 9 12 15 6" />
+                    </svg>
+                </button>
+            )}
             {/* ロゴ */}
             <div className="sidebar-logo">
                 <span className="logo-icon">◌</span>

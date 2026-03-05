@@ -1,27 +1,34 @@
 import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '../lib/supabase';
+import { toCamelCase } from '../lib/dbMappers';
 import type { Issue, IssueComment } from '../types';
 
-const API_BASE = '/api';
-
 /**
- * 課題データ管理用カスタムフック
+ * 課題データ管理用カスタムフック（Supabase版）
  */
 export function useIssues(projectCode?: string) {
     const [issues, setIssues] = useState<Issue[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // 課題取得
+    const mapIssue = (row: Record<string, unknown>) =>
+        toCamelCase(row) as unknown as Issue;
+    const mapComment = (row: Record<string, unknown>) =>
+        toCamelCase(row) as unknown as IssueComment;
+
     const fetchIssues = useCallback(async () => {
         try {
             setLoading(true);
-            const url = projectCode
-                ? `${API_BASE}/issues?projectCode=${encodeURIComponent(projectCode)}`
-                : `${API_BASE}/issues`;
-            const res = await fetch(url);
-            if (!res.ok) throw new Error('課題の取得に失敗しました');
-            const data = await res.json();
-            setIssues(data);
+            let query = supabase
+                .from('issues')
+                .select('*')
+                .order('created_at', { ascending: false });
+            if (projectCode) {
+                query = query.eq('project_code', projectCode);
+            }
+            const { data, error: err } = await query;
+            if (err) throw err;
+            setIssues((data || []).map(mapIssue));
             setError(null);
         } catch (err) {
             setError(err instanceof Error ? err.message : '不明なエラー');
@@ -32,48 +39,68 @@ export function useIssues(projectCode?: string) {
 
     useEffect(() => { fetchIssues(); }, [fetchIssues]);
 
-    // 課題作成
     const createIssue = useCallback(async (input: Partial<Issue>) => {
         try {
-            const body = { ...input, projectCode: projectCode || '' };
-            const res = await fetch(`${API_BASE}/issues`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body),
-            });
-            if (!res.ok) throw new Error('課題の作成に失敗しました');
-            const newIssue = await res.json();
+            const row = {
+                project_code: input.projectCode ?? projectCode ?? '',
+                title: input.title ?? '',
+                description: input.description ?? '',
+                priority: input.priority ?? '中',
+                status: input.status ?? '未対応',
+                assignee: input.assignee ?? '',
+                due_date: input.dueDate ?? '',
+            };
+            const { data, error: err } = await supabase
+                .from('issues')
+                .insert(row)
+                .select()
+                .single();
+            if (err) throw err;
+            const newIssue = mapIssue(data);
             setIssues(prev => [newIssue, ...prev]);
-            return newIssue as Issue;
+            return newIssue;
         } catch (err) {
             setError(err instanceof Error ? err.message : '不明なエラー');
             return null;
         }
     }, [projectCode]);
 
-    // 課題更新
     const updateIssue = useCallback(async (id: string, updates: Partial<Issue>) => {
         try {
-            const res = await fetch(`${API_BASE}/issues/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updates),
-            });
-            if (!res.ok) throw new Error('課題の更新に失敗しました');
-            const updated = await res.json();
+            const map: Record<string, string> = {
+                title: 'title', description: 'description',
+                priority: 'priority', status: 'status',
+                assignee: 'assignee', dueDate: 'due_date',
+            };
+            const row: Record<string, unknown> = {};
+            for (const [key, value] of Object.entries(updates)) {
+                if (map[key] && value !== undefined) row[map[key]] = value;
+            }
+            if (Object.keys(row).length === 0) return null;
+
+            const { data, error: err } = await supabase
+                .from('issues')
+                .update(row)
+                .eq('id', id)
+                .select()
+                .single();
+            if (err) throw err;
+            const updated = mapIssue(data);
             setIssues(prev => prev.map(i => i.id === id ? updated : i));
-            return updated as Issue;
+            return updated;
         } catch (err) {
             setError(err instanceof Error ? err.message : '不明なエラー');
             return null;
         }
     }, []);
 
-    // 課題削除
     const deleteIssue = useCallback(async (id: string) => {
         try {
-            const res = await fetch(`${API_BASE}/issues/${id}`, { method: 'DELETE' });
-            if (!res.ok) throw new Error('課題の削除に失敗しました');
+            const { error: err } = await supabase
+                .from('issues')
+                .delete()
+                .eq('id', id);
+            if (err) throw err;
             setIssues(prev => prev.filter(i => i.id !== id));
             return true;
         } catch (err) {
@@ -82,28 +109,35 @@ export function useIssues(projectCode?: string) {
         }
     }, []);
 
-    // コメント取得
     const fetchComments = useCallback(async (issueId: string) => {
         try {
-            const res = await fetch(`${API_BASE}/issues/${issueId}/comments`);
-            if (!res.ok) throw new Error('コメントの取得に失敗しました');
-            return await res.json() as IssueComment[];
+            const { data, error: err } = await supabase
+                .from('issue_comments')
+                .select('*')
+                .eq('issue_id', issueId)
+                .order('created_at', { ascending: true });
+            if (err) throw err;
+            return (data || []).map(mapComment);
         } catch (err) {
             console.error(err);
             return [];
         }
     }, []);
 
-    // コメント追加
     const addComment = useCallback(async (issueId: string, content: string, userName?: string) => {
         try {
-            const res = await fetch(`${API_BASE}/issues/${issueId}/comments`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ content, userName }),
-            });
-            if (!res.ok) throw new Error('コメントの追加に失敗しました');
-            return await res.json() as IssueComment;
+            const row = {
+                issue_id: issueId,
+                content: content.trim(),
+                user_name: userName ?? 'ユーザー',
+            };
+            const { data, error: err } = await supabase
+                .from('issue_comments')
+                .insert(row)
+                .select()
+                .single();
+            if (err) throw err;
+            return mapComment(data);
         } catch (err) {
             console.error(err);
             return null;

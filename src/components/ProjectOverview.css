@@ -185,3 +185,72 @@
 .meta-value.mono {
     font-family: 'SF Mono', 'Fira Code', monospace;
 }
+
+/* 親プロジェクト検索 */
+.parent-project-group {
+    position: relative;
+}
+
+.parent-project-input-wrap {
+    position: relative;
+}
+
+.parent-project-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 4px;
+    max-height: 240px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+}
+
+.parent-project-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    color: #171717;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.parent-project-option:hover {
+    background: #f5f5f5;
+}
+
+.parent-project-option.selected {
+    background: #e5e5e5;
+}
+
+.parent-project-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.parent-project-code {
+    flex-shrink: 0;
+    font-size: 12px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: #737373;
+}
+
+.parent-project-empty {
+    padding: 12px;
+    font-size: 13px;
+    color: #a3a3a3;
+    text-align: center;
+}

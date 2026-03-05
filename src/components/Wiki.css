@@ -105,8 +105,24 @@
     border-color: #d4d4d4;
 }
 
+.wiki-error-banner {
+    padding: 10px 16px;
+    margin-bottom: 16px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
 .wiki-body {
     min-height: 200px;
+}
+
+.wiki-edit-area {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
 }
 
 /* Markdown挿入パネル */

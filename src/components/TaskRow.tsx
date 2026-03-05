@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, forwardRef } from 'react';
 import type { WBSTask, TaskStatus, UpdateTaskInput } from '../types';
 import { StatusBadge } from './StatusBadge';
 import './TaskRow.css';
@@ -11,16 +11,21 @@ interface TaskRowProps {
     hasChildren: boolean;
     isCollapsed: boolean;
     onToggleCollapse: (id: string) => void;
+    /** ドラッグハンドル（DnD用） */
+    dragHandle?: React.ReactNode;
+    /** tr要素に渡す追加props（style等、refはforwardRefで渡す） */
+    trProps?: Omit<React.HTMLAttributes<HTMLTableRowElement>, 'ref'>;
 }
 
 /**
  * WBSテーブルの各行コンポーネント
  * インライン編集・折りたたみ対応
  */
-export const TaskRow: React.FC<TaskRowProps> = ({
+export const TaskRow = forwardRef<HTMLTableRowElement, TaskRowProps>(({
     task, onUpdate, onDelete, onAddSubTask,
     hasChildren, isCollapsed, onToggleCollapse,
-}) => {
+    dragHandle, trProps,
+}, ref) => {
     const [editingField, setEditingField] = useState<string | null>(null);
     const [editValue, setEditValue] = useState('');
     const inputRef = useRef<HTMLInputElement>(null);
@@ -119,9 +124,14 @@ export const TaskRow: React.FC<TaskRowProps> = ({
     };
 
     return (
-        <tr className={`task-row depth-${task.depth} status-${task.status}`}>
+        <tr
+            ref={ref}
+            className={`task-row depth-${task.depth} status-${task.status}`}
+            {...trProps}
+        >
             {/* 操作ボタン (左端へ移動) */}
             <td className="cell-actions">
+                {dragHandle}
                 <button
                     className="btn-action btn-add-sub"
                     onClick={() => onAddSubTask(task.id)}
@@ -195,7 +205,9 @@ export const TaskRow: React.FC<TaskRowProps> = ({
             </td>
         </tr>
     );
-};
+});
+
+TaskRow.displayName = 'TaskRow';
 
 // 日付フォーマット（YYYY-MM-DD → M/D表示）
 function formatDate(dateStr: string): string {

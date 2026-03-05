@@ -18,7 +18,8 @@ import './App.css';
  */
 function App() {
   const {
-    projects, createProject, updateProject, deleteProject, generateWBS,
+    projects, loading: projectsLoading, error: projectsError,
+    createProject, updateProject, deleteProject, generateWBS, fetchProjects,
   } = useProjects();
 
   // 選択中のプロジェクト
@@ -33,7 +34,7 @@ function App() {
   // 選択プロジェクトのWBSデータ
   const {
     hierarchicalTasks, loading: wbsLoading, error: wbsError,
-    addTask, updateTask, deleteTask, addSubTask, fetchTasks,
+    addTask, updateTask, deleteTask, addSubTask, reorderTasks, fetchTasks,
   } = useWBSData(selectedProject?.projectCode);
 
   // 選択プロジェクトの課題データ
@@ -62,6 +63,16 @@ function App() {
   useEffect(() => {
     localStorage.setItem('wbs-sidebar-width', String(sidebarWidth));
   }, [sidebarWidth]);
+
+  // サイドパネルの格納状態
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    const saved = localStorage.getItem('wbs-sidebar-collapsed');
+    return saved === 'true';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('wbs-sidebar-collapsed', String(sidebarCollapsed));
+  }, [sidebarCollapsed]);
 
   const handleResizeStart = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -108,6 +119,8 @@ function App() {
     if (project) {
       setSelectedProjectId(project.id);
       setCurrentPage('project-overview');
+    } else {
+      console.error('プロジェクト作成失敗:', projectsError);
     }
   };
 
@@ -167,8 +180,12 @@ function App() {
     <div className="app-layout">
       {/* プロジェクトビュー（サイドバー） */}
       <div
-        className="sidebar-wrapper"
-        style={{ width: sidebarWidth, minWidth: SIDEBAR_MIN, maxWidth: SIDEBAR_MAX }}
+        className={`sidebar-wrapper ${sidebarCollapsed ? 'collapsed' : ''}`}
+        style={
+          sidebarCollapsed
+            ? { width: 48, minWidth: 48, maxWidth: 48 }
+            : { width: sidebarWidth, minWidth: SIDEBAR_MIN, maxWidth: SIDEBAR_MAX }
+        }
       >
         <Sidebar
           projects={projects}
@@ -177,25 +194,38 @@ function App() {
           onSelectProject={handleSelectProject}
           onChangePage={setCurrentPage}
           onCreateProject={handleCreateProject}
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed((p) => !p)}
         />
       </div>
 
-      {/* リサイズハンドル */}
-      <div
-        className="sidebar-resize-handle"
-        onMouseDown={handleResizeStart}
-        aria-label="サイドバー幅を変更"
-      />
+      {/* リサイズハンドル（格納時は非表示） */}
+      {!sidebarCollapsed && (
+        <div
+          className="sidebar-resize-handle"
+          onMouseDown={handleResizeStart}
+          aria-label="サイドバー幅を変更"
+        />
+      )}
 
       {/* メインコンテンツ */}
       <main className="main-content">
+        {projectsError && (
+          <div className="error-banner" style={{ margin: '16px 32px' }}>
+            {projectsError}
+          </div>
+        )}
         {!selectedProject ? (
           /* プロジェクト未選択 */
           <div className="welcome">
             <div className="welcome-inner">
               <h2 className="welcome-title">WBS Manager</h2>
               <p className="welcome-desc">プロジェクトを選択するか、新規作成してください。</p>
-              <button className="welcome-btn" onClick={handleCreateProject}>
+              <button
+                className="welcome-btn"
+                onClick={handleCreateProject}
+                disabled={projectsLoading}
+              >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <line x1="12" y1="5" x2="12" y2="19" />
                   <line x1="5" y1="12" x2="19" y2="12" />
@@ -262,6 +292,7 @@ function App() {
                 onUpdate={updateTask}
                 onDelete={handleDelete}
                 onAddSubTask={addSubTask}
+                onReorder={reorderTasks}
               />
             ) : (
               <GanttChart tasks={filteredTasks} />
@@ -280,6 +311,7 @@ function App() {
           <Wiki
             project={selectedProject}
             onUpdate={updateProject}
+            onSaveSuccess={fetchProjects}
           />
         ) : null
         }

@@ -50,15 +50,29 @@
     border-right: none;
 }
 
+.task-row .cell-task,
+.task-row .cell-notes {
+    white-space: normal;
+}
+
 /* セルテキスト */
 .cell-text {
     display: block;
     width: 100%;
+    max-width: 100%;
     cursor: text;
     padding: 2px 4px;
     border-radius: 4px;
     transition: background-color 0.15s ease;
     min-height: 1.4em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cell-task .cell-text,
+.cell-notes .cell-text {
+    white-space: normal;
+    word-break: break-word;
 }
 
 .cell-text:hover {
@@ -167,6 +181,29 @@
     text-align: center;
     white-space: nowrap;
     width: 70px;
+}
+
+/* ドラッグハンドル */
+.drag-handle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    padding: 2px 4px;
+    margin-right: 2px;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    border-radius: 3px;
+    transition: background-color 0.15s ease;
+}
+
+.drag-handle:hover {
+    background-color: var(--color-cell-hover);
+    color: var(--color-accent);
+}
+
+.drag-handle:active {
+    cursor: grabbing;
 }
 
 .btn-action {

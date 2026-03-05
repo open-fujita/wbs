@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { Project } from '../types';
 import { PROJECT_CATEGORIES } from '../types';
 import './ProjectOverview.css';
@@ -40,6 +40,8 @@ export const ProjectOverview: React.FC<ProjectOverviewProps> = ({
             plannedEnd: project.plannedEnd,
             parentId: project.parentId || '',
         });
+        setParentSearch('');
+        setParentDropdownOpen(false);
     }, [project.id, project.name, project.category, project.purpose, project.plannedStart, project.plannedEnd, project.parentId]);
 
     // 自分自身とその子孫を親の候補から除外するための処理
@@ -58,6 +60,37 @@ export const ProjectOverview: React.FC<ProjectOverviewProps> = ({
 
     const invalidParentIds = getInvalidParentIds(project.id);
     const validParentCandidates = allProjects.filter(p => !invalidParentIds.has(p.id));
+
+    // 親プロジェクト検索
+    const [parentSearch, setParentSearch] = useState('');
+    const [parentDropdownOpen, setParentDropdownOpen] = useState(false);
+    const parentWrapRef = useRef<HTMLDivElement>(null);
+
+    const selectedParent = validParentCandidates.find(p => p.id === form.parentId);
+    const filteredParents = parentSearch.trim()
+        ? validParentCandidates.filter(p => {
+            const q = parentSearch.trim().toLowerCase();
+            const name = (p.name || '').toLowerCase();
+            const code = (p.projectCode || '').toLowerCase();
+            return name.includes(q) || code.includes(q);
+        })
+        : validParentCandidates;
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (parentWrapRef.current && !parentWrapRef.current.contains(e.target as Node)) {
+                setParentDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const handleParentSelect = (p: Project | null) => {
+        handleChange('parentId', p ? p.id : '');
+        setParentSearch('');
+        setParentDropdownOpen(false);
+    };
 
     // フィールド更新
     const handleChange = (field: string, value: string) => {
@@ -131,18 +164,47 @@ export const ProjectOverview: React.FC<ProjectOverviewProps> = ({
                     <span className="form-hint">WBS自動生成時のテンプレートが変わります</span>
                 </div>
 
-                <div className="form-group">
+                <div className="form-group parent-project-group" ref={parentWrapRef}>
                     <label className="form-label">親プロジェクト</label>
-                    <select
-                        className="form-input"
-                        value={form.parentId}
-                        onChange={(e) => handleChange('parentId', e.target.value)}
-                    >
-                        <option value="">(なし / トップレベル)</option>
-                        {validParentCandidates.map(p => (
-                            <option key={p.id} value={p.id}>{p.name || p.projectCode}</option>
-                        ))}
-                    </select>
+                    <div className="parent-project-input-wrap">
+                        <input
+                            type="text"
+                            className="form-input"
+                            value={parentDropdownOpen ? parentSearch : (selectedParent ? `${selectedParent.name || selectedParent.projectCode} (${selectedParent.projectCode})` : '')}
+                            onChange={(e) => {
+                                setParentSearch(e.target.value);
+                                setParentDropdownOpen(true);
+                            }}
+                            onFocus={() => setParentDropdownOpen(true)}
+                            placeholder="名前またはコードで検索..."
+                        />
+                        {parentDropdownOpen && (
+                            <div className="parent-project-dropdown">
+                                <button
+                                    type="button"
+                                    className="parent-project-option"
+                                    onClick={() => handleParentSelect(null)}
+                                >
+                                    (なし / トップレベル)
+                                </button>
+                                {filteredParents.length === 0 ? (
+                                    <div className="parent-project-empty">該当なし</div>
+                                ) : (
+                                    filteredParents.map(p => (
+                                        <button
+                                            key={p.id}
+                                            type="button"
+                                            className={`parent-project-option ${form.parentId === p.id ? 'selected' : ''}`}
+                                            onClick={() => handleParentSelect(p)}
+                                        >
+                                            <span className="parent-project-name">{p.name || '無題'}</span>
+                                            <span className="parent-project-code">{p.projectCode}</span>
+                                        </button>
+                                    ))
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <div className="form-group">

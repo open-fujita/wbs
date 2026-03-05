@@ -5,7 +5,8 @@ import './Wiki.css';
 
 interface WikiProps {
     project: Project;
-    onUpdate: (id: string, updates: Partial<Project>) => void;
+    onUpdate: (id: string, updates: Partial<Project>) => Promise<Project | null>;
+    onSaveSuccess?: () => void;
 }
 
 /** 選択範囲を囲む形式で挿入 */
@@ -28,11 +29,12 @@ function insertAtLineStart(text: string, cursor: number, prefix: string): { newT
  * プロジェクトWikiコンポーネント
  * テキストとMarkdown形式で切り替えて記載可能
  */
-export const Wiki: React.FC<WikiProps> = ({ project, onUpdate }) => {
+export const Wiki: React.FC<WikiProps> = ({ project, onUpdate, onSaveSuccess }) => {
     const [content, setContent] = useState(project.wikiContent ?? '');
     const [format, setFormat] = useState<WikiFormat>(project.wikiFormat ?? 'text');
     const [isEditing, setIsEditing] = useState(false);
     const [saved, setSaved] = useState(false);
+    const [saveError, setSaveError] = useState<string | null>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
@@ -40,11 +42,17 @@ export const Wiki: React.FC<WikiProps> = ({ project, onUpdate }) => {
         setFormat((project.wikiFormat ?? 'text') as WikiFormat);
     }, [project.id, project.wikiContent, project.wikiFormat]);
 
-    const handleSave = () => {
-        onUpdate(project.id, { wikiContent: content, wikiFormat: format });
-        setIsEditing(false);
-        setSaved(true);
-        setTimeout(() => setSaved(false), 2000);
+    const handleSave = async () => {
+        setSaveError(null);
+        const updated = await onUpdate(project.id, { wikiContent: content, wikiFormat: format });
+        if (updated) {
+            setIsEditing(false);
+            setSaved(true);
+            setTimeout(() => setSaved(false), 2000);
+            onSaveSuccess?.();
+        } else {
+            setSaveError('保存に失敗しました。もう一度お試しください。');
+        }
     };
 
     const handleFormatChange = (newFormat: WikiFormat) => {
@@ -144,9 +152,14 @@ export const Wiki: React.FC<WikiProps> = ({ project, onUpdate }) => {
                 </div>
             </div>
 
+            {saveError && (
+                <div className="wiki-error-banner">
+                    {saveError}
+                </div>
+            )}
             <div className="wiki-body">
                 {isEditing ? (
-                    <>
+                    <div className="wiki-edit-area">
                         {format === 'markdown' && (
                             <div className="wiki-md-panel">
                                 <span className="wiki-md-panel-label">挿入:</span>
@@ -173,7 +186,7 @@ export const Wiki: React.FC<WikiProps> = ({ project, onUpdate }) => {
                             placeholder={format === 'markdown' ? 'Markdown形式で記述できます。上のパネルから書式を挿入できます。' : 'テキストを入力してください'}
                             spellCheck={false}
                         />
-                    </>
+                    </div>
                 ) : (
                     <div className="wiki-content">
                         {content ? (
