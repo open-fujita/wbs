@@ -1,0 +1,126 @@
+.wbs-table-container {
+    overflow-x: auto;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--color-border-light);
+    background: var(--color-surface);
+}
+
+.wbs-table {
+    width: 100%;
+    min-width: 1100px;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+/* ヘッダー */
+.wbs-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.wbs-table th {
+    background: var(--color-header-bg);
+    color: var(--color-header-text);
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-align: center;
+    padding: 10px 10px;
+    border-bottom: 2px solid var(--color-accent);
+    border-right: 1px solid var(--color-header-border);
+    user-select: none;
+    white-space: nowrap;
+}
+
+.wbs-table th:last-child {
+    border-right: none;
+}
+
+/* 日付グループヘッダー */
+.th-date-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.th-date-label {
+    font-size: 0.72rem;
+    opacity: 0.8;
+    letter-spacing: 0.5px;
+}
+
+.th-date-sub {
+    display: flex;
+    gap: 24px;
+    font-size: 0.75rem;
+}
+
+/* カラム幅 */
+.th-number {
+    width: 50px;
+    min-width: 50px;
+}
+
+.th-category {
+    min-width: 80px;
+}
+
+.th-task {
+    min-width: 200px;
+}
+
+.th-assignee {
+    min-width: 80px;
+}
+
+.th-status {
+    min-width: 90px;
+}
+
+.th-date {
+    min-width: 160px;
+}
+
+.th-notes {
+    min-width: 120px;
+}
+
+.th-actions {
+    width: 70px;
+    min-width: 70px;
+}
+
+/* 空状態 */
+.wbs-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    background: var(--color-surface);
+    border-radius: 12px;
+    border: 2px dashed var(--color-border);
+    text-align: center;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+    opacity: 0.5;
+}
+
+.empty-text {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin: 0 0 6px 0;
+}
+
+.empty-hint {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin: 0;
+    opacity: 0.7;
+}

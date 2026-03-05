@@ -1,0 +1,238 @@
+/* カンバンボード形式の課題管理ビュー */
+
+.issue-board {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+.issue-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    flex-shrink: 0;
+}
+
+.issue-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #171717;
+    margin: 0 0 4px 0;
+    letter-spacing: -0.3px;
+}
+
+.issue-desc {
+    font-size: 13px;
+    color: #737373;
+    margin: 0;
+}
+
+.issue-add-btn {
+    padding: 8px 16px;
+    background: #171717;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.issue-add-btn:hover {
+    background: #404040;
+}
+
+/* フォーム */
+.issue-form {
+    background: #fafafa;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.issue-form-row {
+    display: flex;
+    gap: 12px;
+}
+
+.issue-form-input,
+.issue-form-select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #171717;
+    background: #fff;
+    outline: none;
+}
+
+.issue-form-input.slim {
+    flex: 1;
+}
+
+.issue-form-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* カンバンボードレイアウト */
+.kanban-board {
+    display: flex;
+    gap: 24px;
+    flex: 1;
+    min-height: 0;
+    /* flexbox child scrollable height constraints */
+    overflow-x: auto;
+    padding-bottom: 12px;
+}
+
+.kanban-column {
+    flex: 1;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    background: #f7f7f7;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.kanban-column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.kanban-column-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #171717;
+    margin: 0;
+}
+
+.kanban-column-count {
+    background: #e5e5e5;
+    color: #525252;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+.kanban-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* カンバンカード */
+.kanban-card {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 16px;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    transition: all 0.15s ease;
+}
+
+.kanban-card:hover {
+    border-color: #d4d4d4;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
+    transform: translateY(-1px);
+}
+
+.kanban-card.done {
+    opacity: 0.6;
+}
+
+.kanban-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.kanban-card-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #171717;
+    margin: 0 0 12px 0;
+    line-height: 1.4;
+}
+
+.kanban-card.done .kanban-card-title {
+    text-decoration: line-through;
+}
+
+.kanban-card-meta {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.meta-tag {
+    font-size: 11px;
+    color: #737373;
+    display: inline-flex;
+    align-items: center;
+}
+
+.card-delete-btn {
+    background: transparent;
+    border: none;
+    color: #a3a3a3;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+.card-delete-btn:hover {
+    color: #dc2626;
+}
+
+/* 優先度バッジ */
+.issue-priority {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    letter-spacing: 0.3px;
+}
+
+.priority-high {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.priority-medium {
+    background: #fefce8;
+    color: #ca8a04;
+}
+
+.priority-low {
+    background: #f0f9ff;
+    color: #0284c7;
+}
+
+.kanban-empty {
+    text-align: center;
+    padding: 24px;
+    color: #a3a3a3;
+    font-size: 12px;
+    border: 1px dashed #d4d4d4;
+    border-radius: 8px;
+}

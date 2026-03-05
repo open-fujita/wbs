@@ -1,0 +1,140 @@
+/* V0ライクなApp全体レイアウト - ミニマル、ホワイトベース */
+
+/* アプリレイアウト: サイドバー + メインコンテンツ */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #fff;
+}
+
+/* メインコンテンツ */
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 100vh;
+}
+
+/* ウェルカム画面 */
+.welcome {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.welcome-inner {
+  text-align: center;
+}
+
+.welcome-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #171717;
+  letter-spacing: -0.5px;
+  margin: 0 0 8px;
+}
+
+.welcome-desc {
+  font-size: 14px;
+  color: #737373;
+  margin: 0 0 24px;
+}
+
+.welcome-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #171717;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.welcome-btn:hover {
+  background: #404040;
+}
+
+/* WBSビュー */
+.wbs-view {
+  padding: 24px 32px;
+}
+
+.wbs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.wbs-project-code {
+  font-size: 12px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  color: #a3a3a3;
+  letter-spacing: 0.5px;
+}
+
+.wbs-project-name {
+  font-size: 20px;
+  font-weight: 600;
+  color: #171717;
+  margin: 2px 0 0;
+  letter-spacing: -0.3px;
+}
+
+.wbs-stats {
+  display: flex;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.stat {
+  font-size: 13px;
+  color: #737373;
+}
+
+.stat strong {
+  color: #171717;
+  font-weight: 600;
+}
+
+/* エラーバナー */
+.error-banner {
+  padding: 10px 16px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+/* ローディング */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px;
+  color: #737373;
+  font-size: 14px;
+}
+
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e5e5e5;
+  border-top: 2px solid #171717;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

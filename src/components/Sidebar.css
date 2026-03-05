@@ -1,0 +1,211 @@
+/* V0ライクなサイドバー - ミニマル、モノクロ、余白重視 */
+
+.sidebar {
+    width: 240px;
+    min-width: 240px;
+    height: 100vh;
+    background: #fafafa;
+    border-right: 1px solid #e5e5e5;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    position: sticky;
+    top: 0;
+}
+
+/* ロゴ */
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 16px 12px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.logo-icon {
+    font-size: 18px;
+    color: #171717;
+}
+
+.logo-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #171717;
+    letter-spacing: -0.3px;
+}
+
+/* ナビゲーション */
+.sidebar-nav {
+    flex: 1;
+    padding: 8px 0;
+}
+
+.nav-section {
+    padding: 4px 8px;
+}
+
+.nav-section-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    color: #a3a3a3;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 8px 8px 4px;
+}
+
+/* 新規プロジェクトボタン */
+.new-project-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px dashed #d4d4d4;
+    border-radius: 6px;
+    background: transparent;
+    color: #525252;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.new-project-btn:hover {
+    background: #f5f5f5;
+    border-color: #a3a3a3;
+    color: #171717;
+}
+
+/* プロジェクト一覧 */
+.project-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin-top: 4px;
+}
+
+.project-empty {
+    font-size: 12px;
+    color: #a3a3a3;
+    padding: 12px 8px;
+    text-align: center;
+}
+
+.project-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.project-item:hover {
+    background: #f0f0f0;
+}
+
+.project-item.active {
+    background: #e5e5e5;
+}
+
+/* ツリーの開閉トグル */
+.project-item-toggle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 4px;
+    flex-shrink: 0;
+}
+
+.tree-toggle-btn {
+    background: transparent;
+    border: none;
+    font-size: 10px;
+    color: #a3a3a3;
+    cursor: pointer;
+    padding: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.tree-toggle-btn:hover {
+    background-color: #d4d4d4;
+    color: #171717;
+}
+
+.tree-toggle-placeholder {
+    width: 16px;
+    height: 16px;
+}
+
+.project-icon {
+    flex-shrink: 0;
+    color: #737373;
+}
+
+.project-item.active .project-icon {
+    color: #171717;
+}
+
+.project-item-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.project-item-name {
+    font-size: 13px;
+    color: #404040;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.project-item.active .project-item-name {
+    color: #171717;
+    font-weight: 500;
+}
+
+.project-item-code {
+    font-size: 11px;
+    color: #a3a3a3;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+/* サブナビ */
+.sidebar-subnav {
+    padding: 8px;
+    border-top: 1px solid #e5e5e5;
+}
+
+.subnav-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 6px 8px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #525252;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: left;
+}
+
+.subnav-btn:hover {
+    background: #f0f0f0;
+}
+
+.subnav-btn.active {
+    background: #e5e5e5;
+    color: #171717;
+    font-weight: 500;
+}

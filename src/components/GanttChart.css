@@ -1,0 +1,231 @@
+.gantt-container {
+    background: var(--color-surface);
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--color-border-light);
+    overflow: hidden;
+}
+
+/* ヘッダー */
+.gantt-header {
+    display: flex;
+    background: var(--color-header-bg);
+    border-bottom: 2px solid var(--color-accent);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.gantt-label-col {
+    width: 280px;
+    min-width: 280px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    border-right: 1px solid var(--color-border);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-header-text);
+}
+
+.gantt-timeline-col {
+    flex: 1;
+    position: relative;
+    min-height: 36px;
+    overflow: hidden;
+}
+
+/* 月ラベル */
+.gantt-months {
+    display: flex;
+    height: 100%;
+    position: relative;
+}
+
+.gantt-month {
+    position: absolute;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--color-header-text);
+    border-right: 1px solid var(--color-header-border);
+    white-space: nowrap;
+}
+
+/* ボディ */
+.gantt-body {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.gantt-row {
+    display: flex;
+    border-bottom: 1px solid var(--color-border-light);
+    transition: background-color 0.15s ease;
+}
+
+.gantt-row:hover {
+    background-color: var(--color-row-hover);
+}
+
+.gantt-row.depth-0 .gantt-label-col {
+    font-weight: 600;
+}
+
+/* タスク名 */
+.gantt-task-name {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+}
+
+.gantt-indent {
+    color: var(--color-text-muted);
+    font-size: 0.7rem;
+}
+
+.gantt-task-status {
+    font-size: 0.68rem;
+    padding: 1px 6px;
+    border-radius: 8px;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* タイムラインバー */
+.gantt-bars {
+    position: relative;
+    height: 36px;
+    width: 100%;
+}
+
+.gantt-bar {
+    position: absolute;
+    border-radius: 4px;
+    min-width: 3px;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+}
+
+.gantt-bar:hover {
+    opacity: 0.85;
+    filter: brightness(1.05);
+}
+
+.gantt-bar-planned {
+    top: 6px;
+    height: 12px;
+    background: linear-gradient(135deg, #6366f1, #818cf8);
+    box-shadow: 0 1px 3px rgba(99, 102, 241, 0.35);
+}
+
+.gantt-bar-actual {
+    top: 20px;
+    height: 10px;
+    background: linear-gradient(135deg, #10b981, #34d399);
+    box-shadow: 0 1px 3px rgba(16, 185, 129, 0.35);
+}
+
+/* 今日の線 */
+.gantt-today {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #ef4444;
+    z-index: 5;
+    opacity: 0.7;
+}
+
+.gantt-today::before {
+    content: '今日';
+    position: absolute;
+    top: -18px;
+    left: -12px;
+    font-size: 0.6rem;
+    color: #ef4444;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* 凡例 */
+.gantt-legend {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--color-border-light);
+    background: var(--color-bg);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+}
+
+.legend-bar {
+    width: 20px;
+    height: 8px;
+    border-radius: 3px;
+}
+
+.legend-planned {
+    background: linear-gradient(135deg, #6366f1, #818cf8);
+}
+
+.legend-actual {
+    background: linear-gradient(135deg, #10b981, #34d399);
+}
+
+.legend-line {
+    width: 2px;
+    height: 14px;
+    background: #ef4444;
+    opacity: 0.7;
+}
+
+/* 空状態 */
+.gantt-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    background: var(--color-surface);
+    border-radius: 12px;
+    border: 2px dashed var(--color-border);
+    text-align: center;
+}
+
+.gantt-empty .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+    opacity: 0.5;
+}
+
+.gantt-empty .empty-text {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin: 0 0 6px 0;
+}
+
+.gantt-empty .empty-hint {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin: 0;
+    opacity: 0.7;
+}
