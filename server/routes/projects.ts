@@ -21,6 +21,7 @@ function generateProjectCode(db: ReturnType<typeof getDatabase>): string {
 const PROJECT_SELECT = `
   SELECT id, project_code as projectCode, name, category, purpose,
          planned_start as plannedStart, planned_end as plannedEnd, parent_id as parentId,
+         wiki_content as wikiContent, wiki_format as wikiFormat,
          created_at as createdAt, updated_at as updatedAt
   FROM projects`;
 
@@ -121,7 +122,8 @@ router.put('/:id', (req: Request, res: Response) => {
         const fieldMap: Record<string, string> = {
             name: 'name', category: 'category', purpose: 'purpose',
             plannedStart: 'planned_start', plannedEnd: 'planned_end',
-            parentId: 'parent_id'
+            parentId: 'parent_id',
+            wikiContent: 'wiki_content', wikiFormat: 'wiki_format'
         };
 
         const setClauses: string[] = [];
@@ -166,13 +168,13 @@ router.delete('/:id', (req: Request, res: Response) => {
             const result = db.prepare('DELETE FROM projects WHERE id = ?').run(id);
 
             // 子プロジェクトの親IDをクリア（トップレベルに昇格）
-            db.prepare('UPDATE projects SET parent_id = "" WHERE parent_id = ?').run(id);
+            db.prepare("UPDATE projects SET parent_id = '' WHERE parent_id = ?").run(id);
 
             if (project) {
                 // 紐づくタスクを削除
                 db.prepare('DELETE FROM wbs_tasks WHERE project_code = ?').run(project.project_code);
                 // 紐づく課題のプロジェクトコードをクリア
-                db.prepare('UPDATE issues SET project_code = "" WHERE project_code = ?').run(project.project_code);
+                db.prepare("UPDATE issues SET project_code = '' WHERE project_code = ?").run(project.project_code);
             }
 
             if (result.changes === 0) {

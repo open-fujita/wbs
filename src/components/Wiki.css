@@ -1,0 +1,268 @@
+/* Wikiビュー */
+
+.wiki {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 24px 32px;
+}
+
+.wiki-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.wiki-project-code {
+    font-size: 12px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: #a3a3a3;
+    letter-spacing: 0.5px;
+}
+
+.wiki-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #171717;
+    margin: 2px 0 0;
+    letter-spacing: -0.3px;
+}
+
+.wiki-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.wiki-format-label {
+    font-size: 13px;
+    color: #737373;
+}
+
+.wiki-format-toggle {
+    display: flex;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.wiki-format-toggle .format-btn {
+    padding: 6px 12px;
+    border: none;
+    background: #fff;
+    color: #525252;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.wiki-format-toggle .format-btn:not(:disabled):hover {
+    background: #f5f5f5;
+}
+
+.wiki-format-toggle .format-btn.active {
+    background: #171717;
+    color: #fff;
+}
+
+.wiki-format-toggle .format-btn:disabled {
+    cursor: default;
+}
+
+.wiki-edit-btn,
+.wiki-save-btn {
+    padding: 6px 14px;
+    background: #171717;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.wiki-edit-btn:hover,
+.wiki-save-btn:hover {
+    background: #404040;
+}
+
+.wiki-cancel-btn {
+    padding: 6px 14px;
+    background: transparent;
+    color: #525252;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.wiki-cancel-btn:hover {
+    background: #f5f5f5;
+    border-color: #d4d4d4;
+}
+
+.wiki-body {
+    min-height: 200px;
+}
+
+/* Markdown挿入パネル */
+.wiki-md-panel {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    background: #fafafa;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    flex-wrap: wrap;
+}
+
+.wiki-md-panel-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #737373;
+}
+
+.wiki-md-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.wiki-md-btn {
+    padding: 4px 10px;
+    min-width: 32px;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    background: #fff;
+    color: #525252;
+    font-size: 13px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.wiki-md-btn:hover {
+    background: #f0f0f0;
+    border-color: #d4d4d4;
+}
+
+.wiki-md-btn:active {
+    background: #e5e5e5;
+}
+
+.wiki-textarea {
+    width: 100%;
+    min-height: 400px;
+    padding: 16px;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    line-height: 1.6;
+    color: #171717;
+    background: #fff;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.15s ease;
+    box-sizing: border-box;
+}
+
+.wiki-textarea:focus {
+    border-color: #171717;
+}
+
+.wiki-textarea::placeholder {
+    color: #a3a3a3;
+}
+
+.wiki-content {
+    padding: 16px;
+    background: #fafafa;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    min-height: 200px;
+}
+
+.wiki-plaintext {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #404040;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: inherit;
+}
+
+.wiki-markdown {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #404040;
+}
+
+.wiki-markdown h1,
+.wiki-markdown h2,
+.wiki-markdown h3 {
+    margin: 1.2em 0 0.6em;
+    font-weight: 600;
+    color: #171717;
+}
+
+.wiki-markdown h1 { font-size: 1.5em; }
+.wiki-markdown h2 { font-size: 1.25em; }
+.wiki-markdown h3 { font-size: 1.1em; }
+
+.wiki-markdown h1:first-child,
+.wiki-markdown h2:first-child,
+.wiki-markdown h3:first-child {
+    margin-top: 0;
+}
+
+.wiki-markdown p {
+    margin: 0 0 0.8em;
+}
+
+.wiki-markdown ul,
+.wiki-markdown ol {
+    margin: 0 0 0.8em;
+    padding-left: 1.5em;
+}
+
+.wiki-markdown code {
+    padding: 0.2em 0.4em;
+    background: #e5e5e5;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+.wiki-markdown pre {
+    padding: 12px;
+    background: #e5e5e5;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 0 0 0.8em;
+}
+
+.wiki-markdown pre code {
+    padding: 0;
+    background: none;
+}
+
+.wiki-markdown blockquote {
+    margin: 0 0 0.8em;
+    padding-left: 1em;
+    border-left: 4px solid #d4d4d4;
+    color: #525252;
+}
+
+.wiki-empty {
+    color: #a3a3a3;
+    font-size: 14px;
+    margin: 0;
+}

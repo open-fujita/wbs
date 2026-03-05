@@ -8,6 +8,7 @@ import { Toolbar } from './components/Toolbar';
 import { Sidebar } from './components/Sidebar';
 import { ProjectOverview } from './components/ProjectOverview';
 import { IssueList } from './components/IssueList';
+import { Wiki } from './components/Wiki';
 import type { ViewMode, PageType } from './types';
 import './App.css';
 
@@ -274,6 +275,11 @@ function App() {
             onDelete={deleteIssue}
             fetchComments={fetchComments}
             addComment={addComment}
+          />
+        ) : currentPage === 'wiki' ? (
+          <Wiki
+            project={selectedProject}
+            onUpdate={updateProject}
           />
         ) : null
         }

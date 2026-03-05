@@ -93,6 +93,8 @@ export function getDatabase(): Database.Database {
     safeAlter("ALTER TABLE wbs_tasks ADD COLUMN project_code TEXT DEFAULT ''");
     safeAlter("ALTER TABLE projects ADD COLUMN category TEXT DEFAULT ''");
     safeAlter("ALTER TABLE projects ADD COLUMN parent_id TEXT DEFAULT ''");
+    safeAlter("ALTER TABLE projects ADD COLUMN wiki_content TEXT DEFAULT ''");
+    safeAlter("ALTER TABLE projects ADD COLUMN wiki_format TEXT DEFAULT 'text'");
   }
 
   return db;

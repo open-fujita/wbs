@@ -36,6 +36,8 @@ export interface Project {
     plannedStart: string;
     plannedEnd: string;
     parentId?: string | null;
+    wikiContent?: string;
+    wikiFormat?: WikiFormat;
     createdAt?: string;
     updatedAt?: string;
 }
@@ -64,7 +66,10 @@ export const TASK_STATUSES: TaskStatus[] = ['未着手', '進行中', '完了', 
 export type ViewMode = 'table' | 'gantt';
 
 // サイドバーのページ種別
-export type PageType = 'project-overview' | 'wbs' | 'issues';
+export type PageType = 'project-overview' | 'wbs' | 'issues' | 'wiki';
+
+// Wikiの記述形式
+export type WikiFormat = 'text' | 'markdown';
 
 // 課題の優先度
 export type IssuePriority = '高' | '中' | '低';
