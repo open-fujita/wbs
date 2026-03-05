@@ -120,6 +120,24 @@ export const TaskRow: React.FC<TaskRowProps> = ({
 
     return (
         <tr className={`task-row depth-${task.depth} status-${task.status}`}>
+            {/* 操作ボタン (左端へ移動) */}
+            <td className="cell-actions">
+                <button
+                    className="btn-action btn-add-sub"
+                    onClick={() => onAddSubTask(task.id)}
+                    title="サブタスク追加"
+                >
+                    +
+                </button>
+                <button
+                    className="btn-action btn-delete"
+                    onClick={() => onDelete(task.id)}
+                    title="削除"
+                >
+                    ×
+                </button>
+            </td>
+
             {/* 項番 */}
             <td className="cell-number">{task.itemNumber}</td>
 
@@ -174,24 +192,6 @@ export const TaskRow: React.FC<TaskRowProps> = ({
             {/* 備考 */}
             <td className="cell-notes">
                 {renderEditableCell('notes', task.notes)}
-            </td>
-
-            {/* 操作ボタン */}
-            <td className="cell-actions">
-                <button
-                    className="btn-action btn-add-sub"
-                    onClick={() => onAddSubTask(task.id)}
-                    title="サブタスク追加"
-                >
-                    +
-                </button>
-                <button
-                    className="btn-action btn-delete"
-                    onClick={() => onDelete(task.id)}
-                    title="削除"
-                >
-                    ×
-                </button>
             </td>
         </tr>
     );

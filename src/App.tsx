@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useWBSData } from './hooks/useWBSData';
 import { useProjects } from './hooks/useProjects';
 import { useIssues } from './hooks/useIssues';
@@ -44,6 +44,47 @@ function App() {
   const [viewMode, setViewMode] = useState<ViewMode>('table');
   const [statusFilter, setStatusFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+
+  // プロジェクトビュー（サイドバー）の幅（ドラッグでリサイズ可能）
+  const SIDEBAR_MIN = 180;
+  const SIDEBAR_MAX = 480;
+  const SIDEBAR_DEFAULT = 240;
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    const saved = localStorage.getItem('wbs-sidebar-width');
+    if (saved) {
+      const n = parseInt(saved, 10);
+      if (!isNaN(n) && n >= SIDEBAR_MIN && n <= SIDEBAR_MAX) return n;
+    }
+    return SIDEBAR_DEFAULT;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('wbs-sidebar-width', String(sidebarWidth));
+  }, [sidebarWidth]);
+
+  const handleResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startWidth = sidebarWidth;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const delta = moveEvent.clientX - startX;
+      const next = Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, startWidth + delta));
+      setSidebarWidth(next);
+    };
+
+    const onMouseUp = () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  }, [sidebarWidth]);
 
   // カテゴリ一覧
   const categories = useMemo(() => {
@@ -123,14 +164,26 @@ function App() {
 
   return (
     <div className="app-layout">
-      {/* サイドバー */}
-      <Sidebar
-        projects={projects}
-        selectedProjectId={selectedProjectId}
-        currentPage={currentPage}
-        onSelectProject={handleSelectProject}
-        onChangePage={setCurrentPage}
-        onCreateProject={handleCreateProject}
+      {/* プロジェクトビュー（サイドバー） */}
+      <div
+        className="sidebar-wrapper"
+        style={{ width: sidebarWidth, minWidth: SIDEBAR_MIN, maxWidth: SIDEBAR_MAX }}
+      >
+        <Sidebar
+          projects={projects}
+          selectedProjectId={selectedProjectId}
+          currentPage={currentPage}
+          onSelectProject={handleSelectProject}
+          onChangePage={setCurrentPage}
+          onCreateProject={handleCreateProject}
+        />
+      </div>
+
+      {/* リサイズハンドル */}
+      <div
+        className="sidebar-resize-handle"
+        onMouseDown={handleResizeStart}
+        aria-label="サイドバー幅を変更"
       />
 
       {/* メインコンテンツ */}

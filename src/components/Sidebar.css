@@ -1,8 +1,8 @@
 /* V0ライクなサイドバー - ミニマル、モノクロ、余白重視 */
 
 .sidebar {
-    width: 240px;
-    min-width: 240px;
+    width: 100%;
+    min-width: 0;
     height: 100vh;
     background: #fafafa;
     border-right: 1px solid #e5e5e5;

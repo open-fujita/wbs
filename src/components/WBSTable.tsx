@@ -60,6 +60,7 @@ export const WBSTable: React.FC<WBSTableProps> = ({ tasks, onUpdate, onDelete, o
             <table className="wbs-table">
                 <thead>
                     <tr>
+                        <th className="th-actions">操作</th>
                         <th className="th-number">項番</th>
                         <th className="th-category">カテゴリ</th>
                         <th className="th-task">タスク</th>
@@ -84,7 +85,6 @@ export const WBSTable: React.FC<WBSTableProps> = ({ tasks, onUpdate, onDelete, o
                             </div>
                         </th>
                         <th className="th-notes">備考</th>
-                        <th className="th-actions">操作</th>
                     </tr>
                 </thead>
                 <tbody>

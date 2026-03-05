@@ -7,6 +7,29 @@
   background: #fff;
 }
 
+/* プロジェクトビュー（サイドバー）ラッパー */
+.sidebar-wrapper {
+  flex-shrink: 0;
+  display: flex;
+}
+
+/* リサイズハンドル */
+.sidebar-resize-handle {
+  width: 6px;
+  flex-shrink: 0;
+  cursor: col-resize;
+  background: transparent;
+  transition: background 0.15s ease;
+}
+
+.sidebar-resize-handle:hover {
+  background: #e5e5e5;
+}
+
+.sidebar-resize-handle:active {
+  background: #d4d4d4;
+}
+
 /* メインコンテンツ */
 .main-content {
   flex: 1;

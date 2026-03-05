@@ -88,20 +88,16 @@
     text-align: center;
     color: var(--color-text-muted);
     font-weight: 500;
-    width: 50px;
-    min-width: 50px;
 }
 
 /* カテゴリ */
 .cell-category {
-    min-width: 80px;
-    max-width: 120px;
+    /* WBSTable.css側で幅決定 */
 }
 
 /* タスク名 */
 .cell-task {
-    min-width: 200px;
-    max-width: 350px;
+    /* WBSTable.css側で幅決定 */
 }
 
 .task-name-wrapper {
@@ -114,6 +110,7 @@
     color: var(--color-text-muted);
     font-size: 0.75rem;
     flex-shrink: 0;
+    white-space: pre;
 }
 
 /* 折りたたみトグルボタン */
@@ -141,21 +138,17 @@
 
 /* 担当者 */
 .cell-assignee {
-    min-width: 80px;
-    max-width: 120px;
+    /* WBSTable.css側で幅決定 */
 }
 
 /* ステータス */
 .cell-status {
     text-align: center;
-    min-width: 90px;
 }
 
 /* 日付 */
 .cell-date {
     text-align: center;
-    min-width: 80px;
-    max-width: 110px;
 }
 
 /* 備考 */

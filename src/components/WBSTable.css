@@ -8,9 +8,11 @@
 
 .wbs-table {
     width: 100%;
-    min-width: 1100px;
+    /* コンテンツ幅に合わせた自動調整を有効にするため、固定のmin-widthを削除、または小さく設定 */
+    min-width: 800px;
     border-collapse: collapse;
     font-size: 0.85rem;
+    table-layout: auto;
 }
 
 /* ヘッダー */
@@ -57,39 +59,47 @@
     font-size: 0.75rem;
 }
 
-/* カラム幅 */
+/* カラム幅 (項番や日付など要素が潰れないように nowrap を設定) */
 .th-number {
-    width: 50px;
-    min-width: 50px;
+    width: 1%;
+    white-space: nowrap;
 }
 
 .th-category {
-    min-width: 80px;
+    width: 1%;
+    white-space: nowrap;
 }
 
 .th-task {
-    min-width: 200px;
+    /* タスク名は自動伸縮領域 */
+    width: auto;
+    min-width: 150px;
 }
 
 .th-assignee {
-    min-width: 80px;
+    width: 1%;
+    white-space: nowrap;
 }
 
 .th-status {
-    min-width: 90px;
+    width: 1%;
+    white-space: nowrap;
 }
 
 .th-date {
-    min-width: 160px;
+    width: 1%;
+    white-space: nowrap;
 }
 
 .th-notes {
-    min-width: 120px;
+    /* 備考も自動伸縮 */
+    width: auto;
+    min-width: 100px;
 }
 
 .th-actions {
-    width: 70px;
-    min-width: 70px;
+    width: 1%;
+    white-space: nowrap;
 }
 
 /* 空状態 */

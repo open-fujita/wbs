@@ -63,8 +63,8 @@ router.post('/', (req: Request, res: Response) => {
 
         const id = randomUUID();
 
-        // 項番を自動採番（現在の最大値 + 1）
-        const maxResult = db.prepare('SELECT MAX(item_number) as maxNum FROM wbs_tasks').get() as { maxNum: number | null };
+        // 項番を自動採番（対象プロジェクトの現在の最大値 + 1）
+        const maxResult = db.prepare('SELECT MAX(item_number) as maxNum FROM wbs_tasks WHERE project_code = ?').get(projectCode) as { maxNum: number | null };
         const itemNumber = (maxResult?.maxNum ?? 0) + 1;
 
         // sortOrderが指定されていない場合は項番と同じにする
