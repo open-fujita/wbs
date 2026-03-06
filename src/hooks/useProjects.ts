@@ -52,9 +52,13 @@ export function useProjects() {
 
     const createProject = useCallback(async (input: Partial<Project>) => {
         try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error('ログインが必要です');
+
             const { data: existing } = await supabase
                 .from('projects')
-                .select('project_code');
+                .select('project_code')
+                .eq('user_id', user.id);
             const maxNum = (existing || []).reduce((max, p) => {
                 const m = String(p?.project_code || '').match(/PRJ-(\d+)/);
                 return m ? Math.max(max, parseInt(m[1], 10)) : max;
@@ -63,6 +67,7 @@ export function useProjects() {
 
             const row = {
                 project_code: projectCode,
+                user_id: user.id,
                 name: input.name ?? '',
                 category: input.category ?? '',
                 purpose: input.purpose ?? '',

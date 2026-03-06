@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useAuth } from './hooks/useAuth';
 import { useWBSData } from './hooks/useWBSData';
 import { useProjects } from './hooks/useProjects';
 import { useIssues } from './hooks/useIssues';
@@ -7,6 +8,7 @@ import { GanttChart } from './components/GanttChart';
 import { MandalaChart } from './components/MandalaChart';
 import { Toolbar } from './components/Toolbar';
 import { Sidebar } from './components/Sidebar';
+import { Login } from './components/Login';
 import { ProjectOverview } from './components/ProjectOverview';
 import { IssueList } from './components/IssueList';
 import { Wiki } from './components/Wiki';
@@ -18,6 +20,7 @@ import './App.css';
  * V0ライクなサイドバー + メインコンテンツのレイアウト
  */
 function App() {
+  const { user, loading: authLoading, signInWithGoogle, signInWithGithub, signOut } = useAuth();
   const {
     projects, loading: projectsLoading, error: projectsError,
     createProject, updateProject, deleteProject, generateWBS, fetchProjects,
@@ -177,6 +180,24 @@ function App() {
     }
   };
 
+  if (authLoading) {
+    return (
+      <div className="loading" style={{ minHeight: '100vh' }}>
+        <div className="loading-spinner" />
+        <span>読み込み中...</span>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <Login
+        onSignInWithGoogle={signInWithGoogle}
+        onSignInWithGithub={signInWithGithub}
+      />
+    );
+  }
+
   return (
     <div className="app-layout">
       {/* プロジェクトビュー（サイドバー） */}
@@ -197,6 +218,8 @@ function App() {
           onCreateProject={handleCreateProject}
           collapsed={sidebarCollapsed}
           onToggleCollapse={() => setSidebarCollapsed((p) => !p)}
+          user={user}
+          onSignOut={signOut}
         />
       </div>
 

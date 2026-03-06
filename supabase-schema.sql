@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS projects (
     planned_start TEXT DEFAULT '',
     planned_end TEXT DEFAULT '',
     parent_id UUID REFERENCES projects(id) ON DELETE SET NULL,
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
     wiki_content TEXT DEFAULT '',
     wiki_format TEXT DEFAULT 'text',
     mandala_data JSONB DEFAULT '{"center":"","cells":["","","","","","","",""]}'::jsonb,

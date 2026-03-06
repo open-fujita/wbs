@@ -259,3 +259,37 @@
     color: #171717;
     font-weight: 500;
 }
+
+/* ユーザー・ログアウト */
+.sidebar-user {
+    margin-top: auto;
+    padding: 16px;
+    border-top: 1px solid #e5e5e5;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sidebar-user-email {
+    font-size: 0.75rem;
+    color: #737373;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sidebar-signout-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    background: transparent;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    color: #525252;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.sidebar-signout-btn:hover {
+    background: #e5e5e5;
+    color: #171717;
+}

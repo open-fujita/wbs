@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import type { User } from '@supabase/supabase-js';
 import type { Project, PageType } from '../types';
 import './Sidebar.css';
 
@@ -11,6 +12,8 @@ interface SidebarProps {
     onCreateProject: () => void;
     collapsed?: boolean;
     onToggleCollapse?: () => void;
+    user?: User | null;
+    onSignOut?: () => void;
 }
 
 /**
@@ -26,6 +29,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     onCreateProject,
     collapsed = false,
     onToggleCollapse,
+    user,
+    onSignOut,
 }) => {
     // ツリーの開閉状態
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
@@ -211,6 +216,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             <rect x="9" y="9" width="6" height="6" rx="1" />
                         </svg>
                         マンダラチャート
+                    </button>
+                </div>
+            )}
+
+            {/* ユーザー・ログアウト */}
+            {user && onSignOut && (
+                <div className="sidebar-user">
+                    <span className="sidebar-user-email" title={user.email ?? ''}>
+                        {user.email?.split('@')[0] ?? 'ユーザー'}
+                    </span>
+                    <button
+                        type="button"
+                        className="sidebar-signout-btn"
+                        onClick={onSignOut}
+                        title="ログアウト"
+                    >
+                        ログアウト
                     </button>
                 </div>
             )}
