@@ -95,6 +95,7 @@ export function useProjects() {
                 name: 'name', category: 'category', purpose: 'purpose',
                 plannedStart: 'planned_start', plannedEnd: 'planned_end',
                 parentId: 'parent_id', wikiContent: 'wiki_content', wikiFormat: 'wiki_format',
+                mandalaData: 'mandala_data',
             };
             for (const [key, value] of Object.entries(updates)) {
                 if (map[key] && value !== undefined) {

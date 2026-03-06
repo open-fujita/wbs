@@ -125,8 +125,8 @@
 .gantt-bar-planned {
     top: 6px;
     height: 12px;
-    background: linear-gradient(135deg, #6366f1, #818cf8);
-    box-shadow: 0 1px 3px rgba(99, 102, 241, 0.35);
+    background: linear-gradient(135deg, #525252, #737373);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .gantt-bar-actual {
@@ -183,7 +183,7 @@
 }
 
 .legend-planned {
-    background: linear-gradient(135deg, #6366f1, #818cf8);
+    background: linear-gradient(135deg, #525252, #737373);
 }
 
 .legend-actual {

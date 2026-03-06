@@ -4,6 +4,7 @@ import { useProjects } from './hooks/useProjects';
 import { useIssues } from './hooks/useIssues';
 import { WBSTable } from './components/WBSTable';
 import { GanttChart } from './components/GanttChart';
+import { MandalaChart } from './components/MandalaChart';
 import { Toolbar } from './components/Toolbar';
 import { Sidebar } from './components/Sidebar';
 import { ProjectOverview } from './components/ProjectOverview';
@@ -313,6 +314,8 @@ function App() {
             onUpdate={updateProject}
             onSaveSuccess={fetchProjects}
           />
+        ) : currentPage === 'mandala' ? (
+          <MandalaChart project={selectedProject} onUpdate={updateProject} />
         ) : null
         }
       </main >

@@ -38,6 +38,7 @@ export interface Project {
     parentId?: string | null;
     wikiContent?: string;
     wikiFormat?: WikiFormat;
+    mandalaData?: MandalaData;
     createdAt?: string;
     updatedAt?: string;
 }
@@ -62,11 +63,22 @@ export const STATUS_COLORS: Record<TaskStatus, { bg: string; text: string; borde
 // 利用可能なステータス一覧
 export const TASK_STATUSES: TaskStatus[] = ['未着手', '進行中', '完了', '中断', '取消'];
 
-// ビュー切り替え用
+// ビュー切り替え用（WBS内の表示モード）
 export type ViewMode = 'table' | 'gantt';
 
+// マンダラチャートのデータ構造（9セル: 中心1 + 周囲8）
+// subMandalas: 各セルに対応するサブマンダラ（階層化）
+export interface MandalaData {
+    center: string;
+    cells: [string, string, string, string, string, string, string, string];
+    subMandalas?: [
+        MandalaData | null, MandalaData | null, MandalaData | null, MandalaData | null,
+        MandalaData | null, MandalaData | null, MandalaData | null, MandalaData | null,
+    ];
+}
+
 // サイドバーのページ種別
-export type PageType = 'project-overview' | 'wbs' | 'issues' | 'wiki';
+export type PageType = 'project-overview' | 'wbs' | 'issues' | 'wiki' | 'mandala';
 
 // Wikiの記述形式
 export type WikiFormat = 'text' | 'markdown';

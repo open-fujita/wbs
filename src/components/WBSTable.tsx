@@ -21,7 +21,7 @@ import './WBSTable.css';
 
 const COLUMN_KEYS = ['actions', 'number', 'category', 'task', 'assignee', 'status', 'plannedStart', 'plannedEnd', 'actualStart', 'actualEnd', 'notes'] as const;
 const DEFAULT_WIDTHS: Record<string, number> = {
-    actions: 70, number: 56, category: 90, task: 200, assignee: 80, status: 90,
+    actions: 80, number: 56, category: 90, task: 200, assignee: 80, status: 90,
     plannedStart: 90, plannedEnd: 90, actualStart: 90, actualEnd: 90, notes: 120,
 };
 const COL_MIN = 40;

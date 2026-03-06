@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS projects (
     parent_id UUID REFERENCES projects(id) ON DELETE SET NULL,
     wiki_content TEXT DEFAULT '',
     wiki_format TEXT DEFAULT 'text',
+    mandala_data JSONB DEFAULT '{"center":"","cells":["","","","","","","",""]}'::jsonb,
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now()
 );

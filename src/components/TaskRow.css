@@ -53,6 +53,7 @@
 .task-row .cell-task,
 .task-row .cell-notes {
     white-space: normal;
+    vertical-align: top;
 }
 
 /* セルテキスト */
@@ -65,14 +66,22 @@
     border-radius: 4px;
     transition: background-color 0.15s ease;
     min-height: 1.4em;
+}
+
+.cell-category .cell-text,
+.cell-assignee .cell-text,
+.cell-status .cell-text,
+.cell-date .cell-text {
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .cell-task .cell-text,
 .cell-notes .cell-text {
     white-space: normal;
     word-break: break-word;
+    overflow: visible;
 }
 
 .cell-text:hover {
@@ -90,7 +99,7 @@
     outline: none;
     background: var(--color-input-bg);
     color: var(--color-text);
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+    box-shadow: 0 0 0 2px rgba(23, 23, 23, 0.12);
 }
 
 .cell-input-date {
@@ -116,7 +125,7 @@
 
 .task-name-wrapper {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 4px;
 }
 
@@ -171,16 +180,20 @@
     max-width: 250px;
 }
 
-.cell-notes .cell-text {
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
 /* 操作ボタン */
 .cell-actions {
-    text-align: center;
+    width: 1%;
     white-space: nowrap;
-    width: 70px;
+    overflow: hidden;
+    vertical-align: middle;
+}
+
+.cell-actions-inner {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    max-width: 100%;
 }
 
 /* ドラッグハンドル */
@@ -189,8 +202,8 @@
     align-items: center;
     justify-content: center;
     cursor: grab;
-    padding: 2px 4px;
-    margin-right: 2px;
+    padding: 2px 2px;
+    flex-shrink: 0;
     color: var(--color-text-muted);
     font-size: 0.9rem;
     border-radius: 3px;
@@ -211,10 +224,12 @@
     background: none;
     cursor: pointer;
     font-size: 1rem;
-    padding: 2px 6px;
+    padding: 2px 4px;
     border-radius: 4px;
     transition: all 0.15s ease;
     line-height: 1;
+    flex-shrink: 0;
+    min-width: 24px;
 }
 
 .btn-add-sub {
@@ -222,7 +237,7 @@
 }
 
 .btn-add-sub:hover {
-    background-color: rgba(99, 102, 241, 0.15);
+    background-color: rgba(23, 23, 23, 0.08);
 }
 
 .btn-delete {

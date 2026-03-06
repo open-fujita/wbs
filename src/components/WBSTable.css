@@ -107,6 +107,7 @@
 
 .th-actions {
     width: 1%;
+    min-width: 80px;
     white-space: nowrap;
 }
 

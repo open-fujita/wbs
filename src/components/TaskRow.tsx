@@ -131,21 +131,23 @@ export const TaskRow = forwardRef<HTMLTableRowElement, TaskRowProps>(({
         >
             {/* 操作ボタン (左端へ移動) */}
             <td className="cell-actions">
-                {dragHandle}
-                <button
-                    className="btn-action btn-add-sub"
-                    onClick={() => onAddSubTask(task.id)}
-                    title="サブタスク追加"
-                >
-                    +
-                </button>
-                <button
-                    className="btn-action btn-delete"
-                    onClick={() => onDelete(task.id)}
-                    title="削除"
-                >
-                    ×
-                </button>
+                <div className="cell-actions-inner">
+                    {dragHandle}
+                    <button
+                        className="btn-action btn-add-sub"
+                        onClick={() => onAddSubTask(task.id)}
+                        title="サブタスク追加"
+                    >
+                        +
+                    </button>
+                    <button
+                        className="btn-action btn-delete"
+                        onClick={() => onDelete(task.id)}
+                        title="削除"
+                    >
+                        x
+                    </button>
+                </div>
             </td>
 
             {/* 項番 */}

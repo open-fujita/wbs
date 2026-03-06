@@ -22,5 +22,5 @@
 }
 
 .status-badge:focus {
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 0 0 2px rgba(23, 23, 23, 0.2);
 }
