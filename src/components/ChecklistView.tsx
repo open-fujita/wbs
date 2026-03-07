@@ -168,11 +168,17 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
 
     const handleAddItem = async () => {
         if (!newItemTitle.trim()) return;
-        await onAddItem(checklist.id, newItemTitle.trim(), addingItemParentId ?? null);
-        setNewItemTitle('');
+        const parentId = addingItemParentId ?? null;
+        await onAddItem(checklist.id, newItemTitle.trim(), parentId);
         // 親の展開状態を開く
-        if (addingItemParentId) {
-            setExpandedItemIds(prev => new Set(prev).add(addingItemParentId));
+        if (parentId) {
+            setExpandedItemIds(prev => new Set(prev).add(parentId));
+        }
+        // 子タスク追加時はフォームを閉じる、ルート追加時は連続入力
+        if (parentId) {
+            cancelAddingItem();
+        } else {
+            setNewItemTitle('');
         }
     };
 
