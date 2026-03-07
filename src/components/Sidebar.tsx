@@ -195,7 +195,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {/* ロゴ */}
             <div className="sidebar-logo">
                 <span className="logo-icon">◌</span>
-                <span className="logo-text">WBS Manager</span>
+                <span className="logo-text">OPEN Work Manager</span>
             </div>
 
             {/* ナビゲーション */}

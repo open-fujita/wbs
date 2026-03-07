@@ -51,7 +51,7 @@ export const Login: React.FC<LoginProps> = ({ onSignInWithGoogle, onSignInWithGi
     return (
         <div className="login-page">
             <div className="login-card">
-                <h1 className="login-title">WBS Manager</h1>
+                <h1 className="login-title">OPEN Work Manager</h1>
                 <p className="login-desc">プロジェクトを管理するにはログインしてください</p>
 
                 <div className="login-buttons">

@@ -274,7 +274,7 @@ function App() {
       return (
         <div className="welcome">
           <div className="welcome-inner">
-            <h2 className="welcome-title">WBS Manager</h2>
+            <h2 className="welcome-title">OPEN Work Manager</h2>
             <p className="welcome-desc">プロジェクトを選択するか、新規作成してください。</p>
             <button
               className="welcome-btn"
