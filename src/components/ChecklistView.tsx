@@ -25,8 +25,6 @@ interface ChecklistViewProps {
     onDeleteItem: (itemId: string) => Promise<void>;
     onToggleItem: (itemId: string) => Promise<void>;
     onReorderItems: (checklistId: string, itemIds: string[]) => Promise<void>;
-    onCreateFromTemplate: (name: string, items: { title: string }[], parentId?: string | null) => Promise<Checklist | null>;
-    onCreateFromAI: (title: string, items: { title: string }[], parentId?: string | null) => Promise<Checklist | null>;
     onSaveAsTemplate: (checklistId: string, name: string, category?: string) => Promise<ChecklistTemplate | null>;
     onDeleteTemplate: (templateId: string) => Promise<void>;
 }
@@ -123,7 +121,6 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
     checklist, items, templates, allChecklists,
     onUpdateChecklist, onDeleteChecklist,
     onAddItem, onUpdateItem, onDeleteItem, onToggleItem, onReorderItems,
-    onCreateFromTemplate, onCreateFromAI,
     onSaveAsTemplate, onDeleteTemplate,
 }) => {
     const [showTemplateModal, setShowTemplateModal] = useState(false);
@@ -227,13 +224,17 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
         setTemplateName('');
     };
 
-    const handleTemplateSelect = async (name: string, templateItems: { title: string }[]) => {
-        await onCreateFromTemplate(name, templateItems, checklist.parentId);
+    const handleTemplateSelect = async (_name: string, templateItems: { title: string }[]) => {
+        for (const item of templateItems) {
+            await onAddItem(checklist.id, item.title);
+        }
         setShowTemplateModal(false);
     };
 
-    const handleAICreate = async (title: string, aiItems: { title: string }[]) => {
-        await onCreateFromAI(title, aiItems, checklist.parentId);
+    const handleAICreate = async (_title: string, aiItems: { title: string }[]) => {
+        for (const item of aiItems) {
+            await onAddItem(checklist.id, item.title);
+        }
         setShowAIModal(false);
     };
 

@@ -59,7 +59,7 @@ function App() {
     addItem: addChecklistItem, updateItem: updateChecklistItem,
     deleteItem: deleteChecklistItem, toggleItem: toggleChecklistItem,
     reorderItems: reorderChecklistItems,
-    createFromTemplate, createFromAI, saveAsTemplate, deleteTemplate,
+    saveAsTemplate, deleteTemplate,
   } = useChecklists();
 
   const [viewMode, setViewMode] = useState<ViewMode>('table');
@@ -261,8 +261,6 @@ function App() {
           onDeleteItem={deleteChecklistItem}
           onToggleItem={toggleChecklistItem}
           onReorderItems={reorderChecklistItems}
-          onCreateFromTemplate={createFromTemplate}
-          onCreateFromAI={createFromAI}
           onSaveAsTemplate={saveAsTemplate}
           onDeleteTemplate={deleteTemplate}
         />
