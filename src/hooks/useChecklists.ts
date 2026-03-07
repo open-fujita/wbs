@@ -166,17 +166,22 @@ export function useChecklists() {
     }, [checklists]);
 
     // 項目追加
-    const addItem = useCallback(async (checklistId: string, title: string) => {
+    const addItem = useCallback(async (checklistId: string, title: string, parentId: string | null = null) => {
         try {
             const currentItems = items[checklistId] || [];
+            const siblings = currentItems.filter(i =>
+                (!i.parentId && parentId === null) || i.parentId === parentId
+            );
+            const row: Record<string, unknown> = {
+                checklist_id: checklistId,
+                title,
+                is_completed: false,
+                sort_order: siblings.length,
+                parent_id: parentId,
+            };
             const { data, error: err } = await supabase
                 .from('checklist_items')
-                .insert({
-                    checklist_id: checklistId,
-                    title,
-                    is_completed: false,
-                    sort_order: currentItems.length,
-                })
+                .insert(row)
                 .select()
                 .single();
             if (err) throw err;

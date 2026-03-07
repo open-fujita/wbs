@@ -657,3 +657,64 @@
 .checklist-parent-select:focus {
     border-color: #a3a3a3;
 }
+
+/* 項目ツリーのインデント */
+.checklist-item-indent {
+    flex-shrink: 0;
+}
+
+/* 項目ツリーの開閉トグル */
+.checklist-item-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 16px;
+}
+
+.checklist-tree-toggle-btn {
+    background: transparent;
+    border: none;
+    font-size: 8px;
+    color: #a3a3a3;
+    cursor: pointer;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+}
+
+.checklist-tree-toggle-btn:hover {
+    background: #e5e5e5;
+    color: #171717;
+}
+
+.checklist-tree-toggle-placeholder {
+    width: 16px;
+    height: 16px;
+}
+
+/* 子タスク追加ボタン */
+.checklist-item-add-child {
+    background: none;
+    border: none;
+    color: transparent;
+    cursor: pointer;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    border-radius: 4px;
+}
+
+.checklist-item:hover .checklist-item-add-child {
+    color: #d4d4d4;
+}
+
+.checklist-item-add-child:hover {
+    color: #525252 !important;
+    background: #f0f0f0;
+}

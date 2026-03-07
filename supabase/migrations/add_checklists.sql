@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS checklists (
 CREATE TABLE IF NOT EXISTS checklist_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     checklist_id UUID NOT NULL REFERENCES checklists(id) ON DELETE CASCADE,
+    parent_id UUID REFERENCES checklist_items(id) ON DELETE CASCADE,
     title TEXT NOT NULL DEFAULT '',
     is_completed BOOLEAN DEFAULT false,
     sort_order INTEGER DEFAULT 0,

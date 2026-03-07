@@ -131,6 +131,7 @@ export interface Checklist {
 export interface ChecklistItem {
     id: string;
     checklistId: string;
+    parentId?: string | null;
     title: string;
     isCompleted: boolean;
     sortOrder: number;

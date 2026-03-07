@@ -20,7 +20,7 @@ interface ChecklistViewProps {
     allChecklists: Checklist[];
     onUpdateChecklist: (id: string, updates: Partial<Checklist>) => Promise<void>;
     onDeleteChecklist: (id: string) => Promise<void>;
-    onAddItem: (checklistId: string, title: string) => Promise<ChecklistItem | null>;
+    onAddItem: (checklistId: string, title: string, parentId?: string | null) => Promise<ChecklistItem | null>;
     onUpdateItem: (itemId: string, updates: Partial<ChecklistItem>) => Promise<void>;
     onDeleteItem: (itemId: string) => Promise<void>;
     onToggleItem: (itemId: string) => Promise<void>;
@@ -34,10 +34,15 @@ interface ChecklistViewProps {
 // ソータブル項目コンポーネント
 const SortableItem: React.FC<{
     item: ChecklistItem;
+    depth: number;
+    hasChildren: boolean;
+    isExpanded: boolean;
     onToggle: () => void;
     onUpdate: (title: string) => void;
     onDelete: () => void;
-}> = ({ item, onToggle, onUpdate, onDelete }) => {
+    onAddChild: () => void;
+    onToggleExpand: () => void;
+}> = ({ item, depth, hasChildren, isExpanded, onToggle, onUpdate, onDelete, onAddChild, onToggleExpand }) => {
     const [editing, setEditing] = useState(false);
     const [editValue, setEditValue] = useState(item.title);
 
@@ -61,6 +66,16 @@ const SortableItem: React.FC<{
 
     return (
         <div ref={setNodeRef} style={style} className={`checklist-item ${item.isCompleted ? 'completed' : ''}`}>
+            <div className="checklist-item-indent" style={{ width: `${depth * 20}px`, flexShrink: 0 }} />
+            <div className="checklist-item-toggle">
+                {hasChildren ? (
+                    <button className="checklist-tree-toggle-btn" onClick={onToggleExpand}>
+                        {isExpanded ? '▼' : '▶'}
+                    </button>
+                ) : (
+                    <span className="checklist-tree-toggle-placeholder" />
+                )}
+            </div>
             <button className="drag-handle" {...attributes} {...listeners} tabIndex={-1}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
                     <circle cx="9" cy="5" r="1.5" /><circle cx="15" cy="5" r="1.5" />
@@ -89,6 +104,12 @@ const SortableItem: React.FC<{
                     {item.title}
                 </span>
             )}
+            <button className="checklist-item-add-child" onClick={onAddChild} title="子タスクを追加">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+            </button>
             <button className="checklist-item-delete" onClick={onDelete} title="削除">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
@@ -107,13 +128,14 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
 }) => {
     const [showTemplateModal, setShowTemplateModal] = useState(false);
     const [showAIModal, setShowAIModal] = useState(false);
-    const [addingItem, setAddingItem] = useState(false);
+    const [addingItemParentId, setAddingItemParentId] = useState<string | null | undefined>(undefined);
     const [newItemTitle, setNewItemTitle] = useState('');
     const [editingTitle, setEditingTitle] = useState(false);
     const [editTitleValue, setEditTitleValue] = useState('');
     const [saveTemplateId, setSaveTemplateId] = useState<string | null>(null);
     const [templateName, setTemplateName] = useState('');
     const [editingParent, setEditingParent] = useState(false);
+    const [expandedItemIds, setExpandedItemIds] = useState<Set<string>>(new Set());
 
     const sensors = useSensors(
         useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -131,13 +153,36 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
     };
     const excludeIds = new Set([checklist.id, ...collectDescendantIds(checklist.id)]);
     const parentCandidates = allChecklists.filter(c => !excludeIds.has(c.id));
-
-    // 現在の親の名前
     const parentChecklist = allChecklists.find(c => c.id === checklist.parentId);
+
+    const isAddingItem = addingItemParentId !== undefined;
+
+    const toggleItemExpand = (id: string) => {
+        setExpandedItemIds(prev => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+    };
 
     const handleAddItem = async () => {
         if (!newItemTitle.trim()) return;
-        await onAddItem(checklist.id, newItemTitle.trim());
+        await onAddItem(checklist.id, newItemTitle.trim(), addingItemParentId ?? null);
+        setNewItemTitle('');
+        // 親の展開状態を開く
+        if (addingItemParentId) {
+            setExpandedItemIds(prev => new Set(prev).add(addingItemParentId));
+        }
+    };
+
+    const startAddingItem = (parentId: string | null) => {
+        setAddingItemParentId(parentId);
+        setNewItemTitle('');
+    };
+
+    const cancelAddingItem = () => {
+        setAddingItemParentId(undefined);
         setNewItemTitle('');
     };
 
@@ -188,6 +233,30 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
         await onCreateFromAI(title, aiItems, checklist.parentId);
         setShowAIModal(false);
     };
+
+    // ツリー表示用：再帰的にアイテムをフラット化（表示順）
+    const buildFlatTree = (parentId: string | null, depth: number): { item: ChecklistItem; depth: number }[] => {
+        const children = items.filter(i =>
+            (!i.parentId && parentId === null) || i.parentId === parentId
+        );
+        const result: { item: ChecklistItem; depth: number }[] = [];
+        for (const child of children) {
+            result.push({ item: child, depth });
+            const hasChildren = items.some(i => i.parentId === child.id);
+            if (hasChildren && expandedItemIds.has(child.id)) {
+                result.push(...buildFlatTree(child.id, depth + 1));
+            }
+        }
+        return result;
+    };
+
+    const flatItems = buildFlatTree(null, 0);
+    const allItemIds = flatItems.map(f => f.item.id);
+
+    // 追加フォームの表示位置のインデント
+    const addFormDepth = addingItemParentId
+        ? (flatItems.find(f => f.item.id === addingItemParentId)?.depth ?? 0) + 1
+        : 0;
 
     return (
         <div className="checklist-view">
@@ -307,46 +376,54 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
                     collisionDetection={closestCenter}
                     onDragEnd={handleDragEnd}
                 >
-                    <SortableContext items={items.map(i => i.id)} strategy={verticalListSortingStrategy}>
-                        {items.map(item => (
-                            <SortableItem
-                                key={item.id}
-                                item={item}
-                                onToggle={() => onToggleItem(item.id)}
-                                onUpdate={(title) => onUpdateItem(item.id, { title })}
-                                onDelete={() => onDeleteItem(item.id)}
-                            />
-                        ))}
+                    <SortableContext items={allItemIds} strategy={verticalListSortingStrategy}>
+                        {flatItems.map(({ item, depth }) => {
+                            const hasChildren = items.some(i => i.parentId === item.id);
+                            return (
+                                <SortableItem
+                                    key={item.id}
+                                    item={item}
+                                    depth={depth}
+                                    hasChildren={hasChildren}
+                                    isExpanded={expandedItemIds.has(item.id)}
+                                    onToggle={() => onToggleItem(item.id)}
+                                    onUpdate={(title) => onUpdateItem(item.id, { title })}
+                                    onDelete={() => onDeleteItem(item.id)}
+                                    onAddChild={() => startAddingItem(item.id)}
+                                    onToggleExpand={() => toggleItemExpand(item.id)}
+                                />
+                            );
+                        })}
                     </SortableContext>
                 </DndContext>
 
-                {items.length === 0 && !addingItem && (
+                {items.length === 0 && !isAddingItem && (
                     <div className="checklist-empty-items">
                         <p>項目がありません。追加してください。</p>
                     </div>
                 )}
 
-                {/* 項目追加 */}
-                {addingItem ? (
-                    <div className="checklist-add-item-form">
+                {/* 項目追加フォーム */}
+                {isAddingItem ? (
+                    <div className="checklist-add-item-form" style={{ paddingLeft: `${addFormDepth * 20 + 4}px` }}>
                         <input
                             className="checklist-add-item-input"
-                            placeholder="新しい項目..."
+                            placeholder={addingItemParentId ? '子タスク...' : '新しい項目...'}
                             value={newItemTitle}
                             onChange={e => setNewItemTitle(e.target.value)}
                             onKeyDown={e => {
                                 if (e.key === 'Enter') handleAddItem();
-                                if (e.key === 'Escape') { setAddingItem(false); setNewItemTitle(''); }
+                                if (e.key === 'Escape') cancelAddingItem();
                             }}
                             autoFocus
                         />
                         <button className="btn-small" onClick={handleAddItem}>追加</button>
-                        <button className="btn-small-secondary" onClick={() => { setAddingItem(false); setNewItemTitle(''); }}>×</button>
+                        <button className="btn-small-secondary" onClick={cancelAddingItem}>×</button>
                     </div>
                 ) : (
                     <button
                         className="checklist-add-item-btn"
-                        onClick={() => { setAddingItem(true); setNewItemTitle(''); }}
+                        onClick={() => startAddingItem(null)}
                     >
                         + 項目を追加
                     </button>
