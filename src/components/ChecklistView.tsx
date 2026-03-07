@@ -396,11 +396,11 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
                                         <div className="checklist-add-item-form" style={{ paddingLeft: `${(depth + 1) * 20 + 4}px` }}>
                                             <input
                                                 className="checklist-add-item-input"
-                                                placeholder="子タスク..."
+                                                placeholder="子タスク... (Shift+Enterで追加)"
                                                 value={newItemTitle}
                                                 onChange={e => setNewItemTitle(e.target.value)}
                                                 onKeyDown={e => {
-                                                    if (e.key === 'Enter') handleAddItem();
+                                                    if (e.key === 'Enter' && e.shiftKey) { e.preventDefault(); handleAddItem(); }
                                                     if (e.key === 'Escape') cancelAddingItem();
                                                 }}
                                                 autoFocus
@@ -426,11 +426,11 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
                     <div className="checklist-add-item-form">
                         <input
                             className="checklist-add-item-input"
-                            placeholder="新しい項目..."
+                            placeholder="新しい項目... (Shift+Enterで追加)"
                             value={newItemTitle}
                             onChange={e => setNewItemTitle(e.target.value)}
                             onKeyDown={e => {
-                                if (e.key === 'Enter') handleAddItem();
+                                if (e.key === 'Enter' && e.shiftKey) { e.preventDefault(); handleAddItem(); }
                                 if (e.key === 'Escape') cancelAddingItem();
                             }}
                             autoFocus
