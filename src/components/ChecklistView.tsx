@@ -155,8 +155,6 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
     const parentCandidates = allChecklists.filter(c => !excludeIds.has(c.id));
     const parentChecklist = allChecklists.find(c => c.id === checklist.parentId);
 
-    const isAddingItem = addingItemParentId !== undefined;
-
     const toggleItemExpand = (id: string) => {
         setExpandedItemIds(prev => {
             const next = new Set(prev);
@@ -258,11 +256,6 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
 
     const flatItems = buildFlatTree(null, 0);
     const allItemIds = flatItems.map(f => f.item.id);
-
-    // 追加フォームの表示位置のインデント
-    const addFormDepth = addingItemParentId
-        ? (flatItems.find(f => f.item.id === addingItemParentId)?.depth ?? 0) + 1
-        : 0;
 
     return (
         <div className="checklist-view">
@@ -385,36 +378,55 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
                     <SortableContext items={allItemIds} strategy={verticalListSortingStrategy}>
                         {flatItems.map(({ item, depth }) => {
                             const hasChildren = items.some(i => i.parentId === item.id);
+                            const isAddingChild = addingItemParentId === item.id;
                             return (
-                                <SortableItem
-                                    key={item.id}
-                                    item={item}
-                                    depth={depth}
-                                    hasChildren={hasChildren}
-                                    isExpanded={expandedItemIds.has(item.id)}
-                                    onToggle={() => onToggleItem(item.id)}
-                                    onUpdate={(title) => onUpdateItem(item.id, { title })}
-                                    onDelete={() => onDeleteItem(item.id)}
-                                    onAddChild={() => startAddingItem(item.id)}
-                                    onToggleExpand={() => toggleItemExpand(item.id)}
-                                />
+                                <React.Fragment key={item.id}>
+                                    <SortableItem
+                                        item={item}
+                                        depth={depth}
+                                        hasChildren={hasChildren}
+                                        isExpanded={expandedItemIds.has(item.id)}
+                                        onToggle={() => onToggleItem(item.id)}
+                                        onUpdate={(title) => onUpdateItem(item.id, { title })}
+                                        onDelete={() => onDeleteItem(item.id)}
+                                        onAddChild={() => startAddingItem(item.id)}
+                                        onToggleExpand={() => toggleItemExpand(item.id)}
+                                    />
+                                    {isAddingChild && (
+                                        <div className="checklist-add-item-form" style={{ paddingLeft: `${(depth + 1) * 20 + 4}px` }}>
+                                            <input
+                                                className="checklist-add-item-input"
+                                                placeholder="子タスク..."
+                                                value={newItemTitle}
+                                                onChange={e => setNewItemTitle(e.target.value)}
+                                                onKeyDown={e => {
+                                                    if (e.key === 'Enter') handleAddItem();
+                                                    if (e.key === 'Escape') cancelAddingItem();
+                                                }}
+                                                autoFocus
+                                            />
+                                            <button className="btn-small" onClick={handleAddItem}>追加</button>
+                                            <button className="btn-small-secondary" onClick={cancelAddingItem}>×</button>
+                                        </div>
+                                    )}
+                                </React.Fragment>
                             );
                         })}
                     </SortableContext>
                 </DndContext>
 
-                {items.length === 0 && !isAddingItem && (
+                {items.length === 0 && addingItemParentId === undefined && (
                     <div className="checklist-empty-items">
                         <p>項目がありません。追加してください。</p>
                     </div>
                 )}
 
-                {/* 項目追加フォーム */}
-                {isAddingItem ? (
-                    <div className="checklist-add-item-form" style={{ paddingLeft: `${addFormDepth * 20 + 4}px` }}>
+                {/* ルート項目追加 */}
+                {addingItemParentId === null ? (
+                    <div className="checklist-add-item-form">
                         <input
                             className="checklist-add-item-input"
-                            placeholder={addingItemParentId ? '子タスク...' : '新しい項目...'}
+                            placeholder="新しい項目..."
                             value={newItemTitle}
                             onChange={e => setNewItemTitle(e.target.value)}
                             onKeyDown={e => {
@@ -426,14 +438,14 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
                         <button className="btn-small" onClick={handleAddItem}>追加</button>
                         <button className="btn-small-secondary" onClick={cancelAddingItem}>×</button>
                     </div>
-                ) : (
+                ) : addingItemParentId === undefined ? (
                     <button
                         className="checklist-add-item-btn"
                         onClick={() => startAddingItem(null)}
                     >
                         + 項目を追加
                     </button>
-                )}
+                ) : null}
             </div>
 
             {/* テンプレート保存ダイアログ */}
