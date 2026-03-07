@@ -164,19 +164,18 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
         });
     };
 
-    const handleAddItem = async () => {
+    // continueAdding: true なら同階層で続けて追加、false ならフォームを閉じる
+    const handleAddItem = async (continueAdding: boolean = false) => {
         if (!newItemTitle.trim()) return;
         const parentId = addingItemParentId ?? null;
         await onAddItem(checklist.id, newItemTitle.trim(), parentId);
-        // 親の展開状態を開く
         if (parentId) {
             setExpandedItemIds(prev => new Set(prev).add(parentId));
         }
-        // 子タスク追加時はフォームを閉じる、ルート追加時は連続入力
-        if (parentId) {
-            cancelAddingItem();
-        } else {
+        if (continueAdding) {
             setNewItemTitle('');
+        } else {
+            cancelAddingItem();
         }
     };
 
@@ -396,16 +395,16 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
                                         <div className="checklist-add-item-form" style={{ paddingLeft: `${(depth + 1) * 20 + 4}px` }}>
                                             <input
                                                 className="checklist-add-item-input"
-                                                placeholder="子タスク... (Shift+Enterで追加)"
+                                                placeholder="子タスク... (Enter:完了 / Shift+Enter:続けて追加)"
                                                 value={newItemTitle}
                                                 onChange={e => setNewItemTitle(e.target.value)}
                                                 onKeyDown={e => {
-                                                    if (e.key === 'Enter' && e.shiftKey) { e.preventDefault(); handleAddItem(); }
+                                                    if (e.key === 'Enter') { e.preventDefault(); handleAddItem(e.shiftKey); }
                                                     if (e.key === 'Escape') cancelAddingItem();
                                                 }}
                                                 autoFocus
                                             />
-                                            <button className="btn-small" onClick={handleAddItem}>追加</button>
+                                            <button className="btn-small" onClick={() => handleAddItem(false)}>追加</button>
                                             <button className="btn-small-secondary" onClick={cancelAddingItem}>×</button>
                                         </div>
                                     )}
@@ -426,16 +425,16 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({
                     <div className="checklist-add-item-form">
                         <input
                             className="checklist-add-item-input"
-                            placeholder="新しい項目... (Shift+Enterで追加)"
+                            placeholder="新しい項目... (Enter:完了 / Shift+Enter:続けて追加)"
                             value={newItemTitle}
                             onChange={e => setNewItemTitle(e.target.value)}
                             onKeyDown={e => {
-                                if (e.key === 'Enter' && e.shiftKey) { e.preventDefault(); handleAddItem(); }
+                                if (e.key === 'Enter') { e.preventDefault(); handleAddItem(e.shiftKey); }
                                 if (e.key === 'Escape') cancelAddingItem();
                             }}
                             autoFocus
                         />
-                        <button className="btn-small" onClick={handleAddItem}>追加</button>
+                        <button className="btn-small" onClick={() => handleAddItem(false)}>追加</button>
                         <button className="btn-small-secondary" onClick={cancelAddingItem}>×</button>
                     </div>
                 ) : addingItemParentId === undefined ? (
