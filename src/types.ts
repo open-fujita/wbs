@@ -113,3 +113,40 @@ export interface IssueComment {
     userName: string;
     createdAt: string;
 }
+
+// チェックリスト
+export interface Checklist {
+    id: string;
+    projectCode: string;
+    folder: string;
+    parentId?: string | null;
+    title: string;
+    description: string;
+    sortOrder: number;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+// チェックリスト項目
+export interface ChecklistItem {
+    id: string;
+    checklistId: string;
+    title: string;
+    isCompleted: boolean;
+    sortOrder: number;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+// チェックリストテンプレート
+export interface ChecklistTemplate {
+    id: string;
+    userId?: string;
+    name: string;
+    description: string;
+    category: string;
+    items: { title: string }[];
+    isBuiltin: boolean;
+    createdAt?: string;
+    updatedAt?: string;
+}

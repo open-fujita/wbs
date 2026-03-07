@@ -1,0 +1,102 @@
+/* テンプレート選択モーダル */
+
+.template-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.template-close-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #a3a3a3;
+    cursor: pointer;
+    padding: 4px 8px;
+    line-height: 1;
+}
+
+.template-close-btn:hover {
+    color: #525252;
+}
+
+.template-group {
+    margin-bottom: 20px;
+}
+
+.template-group-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #737373;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.template-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.template-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.template-card:hover {
+    background: #f9fafb;
+    border-color: #d4d4d4;
+}
+
+.template-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.template-card-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #171717;
+}
+
+.template-card-desc {
+    font-size: 12px;
+    color: #a3a3a3;
+}
+
+.template-card-count {
+    font-size: 12px;
+    color: #737373;
+    background: #f1f5f9;
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.template-delete-btn {
+    background: none;
+    border: none;
+    color: #a3a3a3;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.template-delete-btn:hover {
+    color: #dc2626;
+    background: #fef2f2;
+}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { User } from '@supabase/supabase-js';
-import type { Project, PageType } from '../types';
+import type { Project, PageType, Checklist, ChecklistItem } from '../types';
 import './Sidebar.css';
 
 interface SidebarProps {
@@ -14,6 +14,12 @@ interface SidebarProps {
     onToggleCollapse?: () => void;
     user?: User | null;
     onSignOut?: () => void;
+    // チェックリスト
+    checklists: Checklist[];
+    checklistItems: Record<string, ChecklistItem[]>;
+    selectedChecklistId: string | null;
+    onSelectChecklist: (id: string) => void;
+    onCreateChecklist: (parentId?: string | null) => void;
 }
 
 /**
@@ -31,8 +37,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
     onToggleCollapse,
     user,
     onSignOut,
+    checklists,
+    checklistItems,
+    selectedChecklistId,
+    onSelectChecklist,
+    onCreateChecklist,
 }) => {
-    // ツリーの開閉状態
+    // ツリーの開閉状態（プロジェクト・チェックリスト共用）
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
     const toggleExpand = (e: React.MouseEvent, id: string) => {
@@ -57,7 +68,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             return (
                 <React.Fragment key={project.id}>
                     <div
-                        className={`project-item ${selectedProjectId === project.id ? 'active' : ''}`}
+                        className={`project-item ${selectedProjectId === project.id && !selectedChecklistId ? 'active' : ''}`}
                         onClick={() => onSelectProject(project.id)}
                         style={{ paddingLeft: `${16 + depth * 16}px` }}
                     >
@@ -79,6 +90,69 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         </div>
                     </div>
                     {hasChildren && isExpanded && renderProjectTree(project.id, depth + 1)}
+                </React.Fragment>
+            );
+        });
+    };
+
+    // チェックリスト項目の進捗を計算
+    const getProgress = (id: string) => {
+        const items = checklistItems[id] || [];
+        if (items.length === 0) return null;
+        const done = items.filter(i => i.isCompleted).length;
+        return { done, total: items.length };
+    };
+
+    // チェックリストツリーの再帰的レンダリング
+    const renderChecklistTree = (parentId: string | null = null, depth: number = 0) => {
+        const children = checklists.filter(c =>
+            (!c.parentId && parentId === null) || c.parentId === parentId
+        );
+        if (children.length === 0) return null;
+
+        return children.map(cl => {
+            const hasChildren = checklists.some(c => c.parentId === cl.id);
+            const isExpanded = expandedIds.has(`cl-${cl.id}`);
+            const progress = getProgress(cl.id);
+
+            return (
+                <React.Fragment key={cl.id}>
+                    <div
+                        className={`project-item ${selectedChecklistId === cl.id ? 'active' : ''}`}
+                        onClick={() => onSelectChecklist(cl.id)}
+                        style={{ paddingLeft: `${16 + depth * 16}px` }}
+                    >
+                        <div className="project-item-toggle">
+                            {hasChildren ? (
+                                <button className="tree-toggle-btn" onClick={(e) => toggleExpand(e, `cl-${cl.id}`)}>
+                                    {isExpanded ? '▼' : '▶'}
+                                </button>
+                            ) : (
+                                <span className="tree-toggle-placeholder" />
+                            )}
+                        </div>
+                        <svg className="project-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                            <path d="M9 11l3 3L22 4" />
+                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                        </svg>
+                        <div className="project-item-info">
+                            <span className="project-item-name">{cl.title || '無題'}</span>
+                            {progress && (
+                                <span className="project-item-code">{progress.done}/{progress.total}</span>
+                            )}
+                        </div>
+                        <button
+                            className="tree-add-child-btn"
+                            onClick={(e) => { e.stopPropagation(); onCreateChecklist(cl.id); }}
+                            title="子チェックリストを追加"
+                        >
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                        </button>
+                    </div>
+                    {hasChildren && isExpanded && renderChecklistTree(cl.id, depth + 1)}
                 </React.Fragment>
             );
         });
@@ -126,22 +200,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             {/* ナビゲーション */}
             <nav className="sidebar-nav">
-                <div className="nav-section">
-                    <button
-                        className="nav-btn new-project-btn"
-                        onClick={onCreateProject}
-                    >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <line x1="12" y1="5" x2="12" y2="19" />
-                            <line x1="5" y1="12" x2="19" y2="12" />
-                        </svg>
-                        新規プロジェクト
-                    </button>
-                </div>
-
                 {/* プロジェクト一覧 */}
                 <div className="nav-section">
-                    <span className="nav-section-label">プロジェクト</span>
+                    <div className="nav-section-header">
+                        <span className="nav-section-label">プロジェクト</span>
+                        <button
+                            className="nav-section-add-btn"
+                            onClick={onCreateProject}
+                            title="新規プロジェクト"
+                        >
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                        </button>
+                    </div>
                     <div className="project-list">
                         {projects.length === 0 ? (
                             <span className="project-empty">プロジェクトなし</span>
@@ -150,10 +223,34 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         )}
                     </div>
                 </div>
+
+                {/* チェックリスト一覧 */}
+                <div className="nav-section">
+                    <div className="nav-section-header">
+                        <span className="nav-section-label">チェックリスト</span>
+                        <button
+                            className="nav-section-add-btn"
+                            onClick={() => onCreateChecklist(null)}
+                            title="新規チェックリスト"
+                        >
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div className="project-list">
+                        {checklists.length === 0 ? (
+                            <span className="project-empty">チェックリストなし</span>
+                        ) : (
+                            renderChecklistTree(null, 0)
+                        )}
+                    </div>
+                </div>
             </nav>
 
             {/* 選択中プロジェクトのサブナビ */}
-            {selectedProjectId && (
+            {selectedProjectId && !selectedChecklistId && (
                 <div className="sidebar-subnav">
                     <span className="nav-section-label">ビュー</span>
                     <button

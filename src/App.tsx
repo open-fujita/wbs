@@ -3,6 +3,7 @@ import { useAuth } from './hooks/useAuth';
 import { useWBSData } from './hooks/useWBSData';
 import { useProjects } from './hooks/useProjects';
 import { useIssues } from './hooks/useIssues';
+import { useChecklists } from './hooks/useChecklists';
 import { WBSTable } from './components/WBSTable';
 import { GanttChart } from './components/GanttChart';
 import { MandalaChart } from './components/MandalaChart';
@@ -11,6 +12,7 @@ import { Sidebar } from './components/Sidebar';
 import { Login } from './components/Login';
 import { ProjectOverview } from './components/ProjectOverview';
 import { IssueList } from './components/IssueList';
+import { ChecklistView } from './components/ChecklistView';
 import { Wiki } from './components/Wiki';
 import type { ViewMode, PageType } from './types';
 import './App.css';
@@ -30,6 +32,9 @@ function App() {
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<PageType>('project-overview');
 
+  // 選択中のチェックリスト（プロジェクトとは独立）
+  const [selectedChecklistId, setSelectedChecklistId] = useState<string | null>(null);
+
   const selectedProject = useMemo(
     () => projects.find(p => p.id === selectedProjectId) || null,
     [projects, selectedProjectId]
@@ -46,6 +51,16 @@ function App() {
     issues, createIssue, updateIssue, deleteIssue,
     fetchComments, addComment
   } = useIssues(selectedProject?.projectCode);
+
+  // チェックリストデータ（プロジェクト非依存）
+  const {
+    checklists, items: checklistItems, templates: checklistTemplates,
+    createChecklist, updateChecklist, deleteChecklist,
+    addItem: addChecklistItem, updateItem: updateChecklistItem,
+    deleteItem: deleteChecklistItem, toggleItem: toggleChecklistItem,
+    reorderItems: reorderChecklistItems,
+    createFromTemplate, createFromAI, saveAsTemplate, deleteTemplate,
+  } = useChecklists();
 
   const [viewMode, setViewMode] = useState<ViewMode>('table');
   const [statusFilter, setStatusFilter] = useState('');
@@ -117,22 +132,53 @@ function App() {
     });
   }, [hierarchicalTasks, statusFilter, categoryFilter]);
 
+  // 選択中のチェックリスト
+  const selectedChecklist = useMemo(
+    () => checklists.find(c => c.id === selectedChecklistId) || null,
+    [checklists, selectedChecklistId]
+  );
+
   // 新規プロジェクト作成
   const handleCreateProject = async () => {
     const project = await createProject({ name: '', purpose: '' });
     if (project) {
       setSelectedProjectId(project.id);
+      setSelectedChecklistId(null);
       setCurrentPage('project-overview');
     } else {
       console.error('プロジェクト作成失敗:', projectsError);
     }
   };
 
-  // プロジェクト選択
+  // プロジェクト選択（チェックリスト選択をクリア）
   const handleSelectProject = (id: string) => {
     setSelectedProjectId(id);
+    setSelectedChecklistId(null);
     setStatusFilter('');
     setCategoryFilter('');
+  };
+
+  // チェックリスト選択（プロジェクト選択をクリア）
+  const handleSelectChecklist = (id: string) => {
+    setSelectedChecklistId(id);
+    setSelectedProjectId(null);
+  };
+
+  // 新規チェックリスト作成
+  const handleCreateChecklist = async (parentId: string | null = null) => {
+    const checklist = await createChecklist('新規チェックリスト', parentId);
+    if (checklist) {
+      setSelectedChecklistId(checklist.id);
+      setSelectedProjectId(null);
+    }
+  };
+
+  // チェックリスト削除
+  const handleDeleteChecklist = async (id: string) => {
+    await deleteChecklist(id);
+    if (selectedChecklistId === id) {
+      setSelectedChecklistId(null);
+    }
   };
 
   // プロジェクト削除
@@ -198,6 +244,152 @@ function App() {
     );
   }
 
+  // メインコンテンツの描画
+  const renderMainContent = () => {
+    // チェックリストが選択されている場合
+    if (selectedChecklist) {
+      return (
+        <ChecklistView
+          checklist={selectedChecklist}
+          items={checklistItems[selectedChecklist.id] || []}
+          templates={checklistTemplates}
+          allChecklists={checklists}
+          onUpdateChecklist={updateChecklist}
+          onDeleteChecklist={handleDeleteChecklist}
+          onAddItem={addChecklistItem}
+          onUpdateItem={updateChecklistItem}
+          onDeleteItem={deleteChecklistItem}
+          onToggleItem={toggleChecklistItem}
+          onReorderItems={reorderChecklistItems}
+          onCreateFromTemplate={createFromTemplate}
+          onCreateFromAI={createFromAI}
+          onSaveAsTemplate={saveAsTemplate}
+          onDeleteTemplate={deleteTemplate}
+        />
+      );
+    }
+
+    // プロジェクトが選択されていない場合
+    if (!selectedProject) {
+      return (
+        <div className="welcome">
+          <div className="welcome-inner">
+            <h2 className="welcome-title">WBS Manager</h2>
+            <p className="welcome-desc">プロジェクトを選択するか、新規作成してください。</p>
+            <button
+              className="welcome-btn"
+              onClick={handleCreateProject}
+              disabled={projectsLoading}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              新規プロジェクト
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    // プロジェクトのサブページ
+    if (currentPage === 'project-overview') {
+      return (
+        <ProjectOverview
+          project={selectedProject}
+          allProjects={projects}
+          onUpdate={updateProject}
+          onDelete={handleDeleteProject}
+          onGenerateWBS={handleGenerateWBS}
+          onNavigateToWBS={() => setCurrentPage('wbs')}
+        />
+      );
+    }
+
+    if (currentPage === 'wbs') {
+      return (
+        <div className="wbs-view">
+          <div className="wbs-header">
+            <div>
+              <span className="wbs-project-code">{selectedProject.projectCode}</span>
+              <h2 className="wbs-project-name">{selectedProject.name || '無題のプロジェクト'}</h2>
+            </div>
+            <div className="wbs-stats">
+              <span className="stat">
+                全タスク: <strong>{hierarchicalTasks.length}</strong>
+              </span>
+              <span className="stat">
+                進行中: <strong>{hierarchicalTasks.filter(t => t.status === '進行中').length}</strong>
+              </span>
+              <span className="stat">
+                完了: <strong>{hierarchicalTasks.filter(t => t.status === '完了').length}</strong>
+              </span>
+            </div>
+          </div>
+
+          {wbsError && <div className="error-banner">{wbsError}</div>}
+
+          <Toolbar
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            onAddTask={handleAddTask}
+            statusFilter={statusFilter}
+            onStatusFilterChange={setStatusFilter}
+            categoryFilter={categoryFilter}
+            onCategoryFilterChange={setCategoryFilter}
+            categories={categories}
+          />
+
+          {wbsLoading ? (
+            <div className="loading">
+              <div className="loading-spinner" />
+              <span>読み込み中...</span>
+            </div>
+          ) : viewMode === 'table' ? (
+            <WBSTable
+              tasks={filteredTasks}
+              onUpdate={updateTask}
+              onDelete={handleDelete}
+              onAddSubTask={addSubTask}
+              onReorder={reorderTasks}
+            />
+          ) : (
+            <GanttChart tasks={filteredTasks} />
+          )}
+        </div>
+      );
+    }
+
+    if (currentPage === 'issues') {
+      return (
+        <IssueList
+          issues={issues}
+          onCreate={createIssue}
+          onUpdate={updateIssue}
+          onDelete={deleteIssue}
+          fetchComments={fetchComments}
+          addComment={addComment}
+        />
+      );
+    }
+
+    if (currentPage === 'wiki') {
+      return (
+        <Wiki
+          project={selectedProject}
+          onUpdate={updateProject}
+          onSaveSuccess={fetchProjects}
+        />
+      );
+    }
+
+    if (currentPage === 'mandala') {
+      return <MandalaChart project={selectedProject} onUpdate={updateProject} />;
+    }
+
+    return null;
+  };
+
   return (
     <div className="app-layout">
       {/* プロジェクトビュー（サイドバー） */}
@@ -220,6 +412,11 @@ function App() {
           onToggleCollapse={() => setSidebarCollapsed((p) => !p)}
           user={user}
           onSignOut={signOut}
+          checklists={checklists}
+          checklistItems={checklistItems}
+          selectedChecklistId={selectedChecklistId}
+          onSelectChecklist={handleSelectChecklist}
+          onCreateChecklist={handleCreateChecklist}
         />
       </div>
 
@@ -239,110 +436,9 @@ function App() {
             {projectsError}
           </div>
         )}
-        {!selectedProject ? (
-          /* プロジェクト未選択 */
-          <div className="welcome">
-            <div className="welcome-inner">
-              <h2 className="welcome-title">WBS Manager</h2>
-              <p className="welcome-desc">プロジェクトを選択するか、新規作成してください。</p>
-              <button
-                className="welcome-btn"
-                onClick={handleCreateProject}
-                disabled={projectsLoading}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-                新規プロジェクト
-              </button>
-            </div>
-          </div>
-        ) : currentPage === 'project-overview' ? (
-          /* プロジェクト概要 */
-          <ProjectOverview
-            project={selectedProject}
-            allProjects={projects}
-            onUpdate={updateProject}
-            onDelete={handleDeleteProject}
-            onGenerateWBS={handleGenerateWBS}
-            onNavigateToWBS={() => setCurrentPage('wbs')}
-          />
-        ) : currentPage === 'wbs' ? (
-          <div className="wbs-view">
-            {/* ヘッダー */}
-            <div className="wbs-header">
-              <div>
-                <span className="wbs-project-code">{selectedProject.projectCode}</span>
-                <h2 className="wbs-project-name">{selectedProject.name || '無題のプロジェクト'}</h2>
-              </div>
-              <div className="wbs-stats">
-                <span className="stat">
-                  全タスク: <strong>{hierarchicalTasks.length}</strong>
-                </span>
-                <span className="stat">
-                  進行中: <strong>{hierarchicalTasks.filter(t => t.status === '進行中').length}</strong>
-                </span>
-                <span className="stat">
-                  完了: <strong>{hierarchicalTasks.filter(t => t.status === '完了').length}</strong>
-                </span>
-              </div>
-            </div>
-
-            {/* エラー表示 */}
-            {wbsError && <div className="error-banner">⚠️ {wbsError}</div>}
-
-            {/* ツールバー */}
-            <Toolbar
-              viewMode={viewMode}
-              onViewModeChange={setViewMode}
-              onAddTask={handleAddTask}
-              statusFilter={statusFilter}
-              onStatusFilterChange={setStatusFilter}
-              categoryFilter={categoryFilter}
-              onCategoryFilterChange={setCategoryFilter}
-              categories={categories}
-            />
-
-            {/* コンテンツ */}
-            {wbsLoading ? (
-              <div className="loading">
-                <div className="loading-spinner" />
-                <span>読み込み中...</span>
-              </div>
-            ) : viewMode === 'table' ? (
-              <WBSTable
-                tasks={filteredTasks}
-                onUpdate={updateTask}
-                onDelete={handleDelete}
-                onAddSubTask={addSubTask}
-                onReorder={reorderTasks}
-              />
-            ) : (
-              <GanttChart tasks={filteredTasks} />
-            )}
-          </div>
-        ) : currentPage === 'issues' ? (
-          <IssueList
-            issues={issues}
-            onCreate={createIssue}
-            onUpdate={updateIssue}
-            onDelete={deleteIssue}
-            fetchComments={fetchComments}
-            addComment={addComment}
-          />
-        ) : currentPage === 'wiki' ? (
-          <Wiki
-            project={selectedProject}
-            onUpdate={updateProject}
-            onSaveSuccess={fetchProjects}
-          />
-        ) : currentPage === 'mandala' ? (
-          <MandalaChart project={selectedProject} onUpdate={updateProject} />
-        ) : null
-        }
-      </main >
-    </div >
+        {renderMainContent()}
+      </main>
+    </div>
   );
 }
 

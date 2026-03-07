@@ -228,6 +228,59 @@
     font-family: 'SF Mono', 'Fira Code', monospace;
 }
 
+/* セクションヘッダー（ラベル+追加ボタン） */
+.nav-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: 4px;
+}
+
+.nav-section-add-btn {
+    background: none;
+    border: none;
+    color: #a3a3a3;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-section-add-btn:hover {
+    color: #171717;
+    background: #e5e5e5;
+}
+
+.folder-item {
+    font-weight: 500;
+}
+
+/* ツリー項目ホバー時の子追加ボタン */
+.tree-add-child-btn {
+    background: none;
+    border: none;
+    color: transparent;
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.project-item:hover .tree-add-child-btn {
+    color: #a3a3a3;
+}
+
+.tree-add-child-btn:hover {
+    color: #171717 !important;
+    background: #e5e5e5;
+}
+
 /* サブナビ */
 .sidebar-subnav {
     padding: 8px;
